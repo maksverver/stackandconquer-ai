@@ -6,6 +6,9 @@ StackAndConquer: https://github.com/ElTh0r0/stackandconquer/
 This repository currently contains two different players that share some common
 code, based on two different algorithms: Minimax and Monte Carlo.
 
+The source code must remain ECMAScript 5 compatible for now. See:
+https://github.com/ElTh0r0/stackandconquer/issues/13
+
 
 RUNNING
 --------
