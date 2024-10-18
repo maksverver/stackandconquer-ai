@@ -3,6 +3,8 @@
 //
 // See parsing.js for the opposite.
 
+import {fieldIndexToRowCol} from "./util.js";
+
 export function formatRow(row) {
   return String(row + 1);
 }
@@ -11,17 +13,19 @@ export function formatCol(col) {
   return String.fromCharCode('a'.charCodeAt(0) + col);
 }
 
+export function formatField(cfg, field) {
+  var coords = fieldIndexToRowCol(cfg, field);
+  return formatCol(coords[1]) + formatRow(coords[0]);
+}
+
 export function formatMove(cfg, move) {
   if (move.length === 0) return 'pass';
-  var cols = cfg.cols;
-  var c1 = move[1] % cols;
-  var r1 = (move[1] - c1) / cols;
-  var c2 = move[2] % cols;
-  var r2 = (move[2] - c2) / cols;
+  var src = formatField(cfg, move[1]);
+  var dst = formatField(cfg, move[2]);
   var res = '';
   if (move[0] != 1) res += String(move[0]);
-  res += formatCol(c1) + formatRow(r1);
-  if (r1 != r2 || c1 != c2) res += formatCol(c2) + formatRow(r2);
+  res += src;
+  if (src !== dst) res += dst;
   return res;
 }
 

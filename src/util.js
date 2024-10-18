@@ -9,17 +9,19 @@ export var log = typeof game === 'object' ? game.log : console.log;
 // `moves` field is a template of moves that is used by State.generateMoves()
 // to generate valid moves efficiently.
 export function createConfig(
-    rows, cols, inputFields, outside, padding,
+    rows, cols, inputFields, outside, padding, paddingSize,
     winningHeight, winningScore, piecesPerPlayer, playerCount) {
-  if (inputFields.length !== rows * cols) {
+  var paddedRows = rows + 2*paddingSize;
+  var paddedCols = cols + 2*paddingSize;
+  if (inputFields.length !== paddedRows * paddedCols) {
     throw new Error('Invalid length of input fields');
   }
   var apiToFieldIndex = [];
   var fieldIndexToApi = [];
   var fieldCount = 0;
-  for (var r1 = 0; r1 < rows; ++r1) {
-    for (var c1 = 0; c1 < cols; ++c1) {
-      var i = cols * r1 + c1;
+  for (var r1 = 0; r1 < paddedRows; ++r1) {
+    for (var c1 = 0; c1 < paddedCols; ++c1) {
+      var i = paddedCols * r1 + c1;
       if (inputFields[i] === outside || inputFields[i] === padding) {
         apiToFieldIndex.push(-1);
       } else {
@@ -37,9 +39,9 @@ export function createConfig(
   var moves = [];
   var DR = [-1, -1, -1,  0,  0, +1, +1, +1];
   var DC = [-1,  0, +1, -1, +1, -1,  0, +1];
-  for (var r2 = 0; r2 < rows; ++r2) {
-    for (var c2 = 0; c2 < cols; ++c2) {
-      var j = cols * r2 + c2;
+  for (var r2 = 0; r2 < paddedRows; ++r2) {
+    for (var c2 = 0; c2 < paddedCols; ++c2) {
+      var j = paddedCols * r2 + c2;
       if (inputFields[j] === outside || inputFields[j] === padding) continue;
       var dst = moves.length;
       moves.push([]);
@@ -52,10 +54,10 @@ export function createConfig(
         for (var height = 1; height < winningHeight; ++height) {
           var r1 = r2 - dr*height;
           var c1 = c2 - dc*height;
-          if (r1 < 0 || r1 >= rows || c1 < 0 || c1 >= cols) break;
-          var i = cols * r1 + c1;
+          if (r1 < 0 || r1 >= paddedRows || c1 < 0 || c1 >= paddedCols) break;
+          var i = paddedCols * r1 + c1;
           if (inputFields[i] === outside || inputFields[i] === padding) break;
-          var src = apiToFieldIndex[r1*cols + c1];
+          var src = apiToFieldIndex[i];
           moves[dst][height].push([src, mask]);
           mask |= 1 << src;
         }
@@ -72,12 +74,30 @@ export function createConfig(
     winningScore: winningScore,
     piecesPerPlayer: piecesPerPlayer,
     playerCount: playerCount,
-    // These are only used for parseMove() and debug-printing:
+    // These are only used for move parsing/formatting and debug printing:
     rows: rows,
     cols: cols,
-    // Maybe add this to debug-print non-rectangular boards:
-    // inputFields: inputFields,
+    paddingSize: paddingSize,
   });
+}
+
+// Converts a compact field index (which must be valid, i.e., an integer between
+// 0 and cfg.fieldCount, exclusive) to a [row, col] pair.
+export function fieldIndexToRowCol(cfg, index) {
+  var i = cfg.fieldIndexToApi[index];
+  var pad = cfg.paddingSize;
+  var rowStride = pad * 2 + cfg.cols;
+  var col = i % rowStride;
+  var row = (i - col)/rowStride;
+  return [row - pad, col - pad];
+}
+
+// Converts a row/column pair to a compact field index, or returns -1 if the
+// given coordinates are not part of the board.
+export function rowColToFieldIndex(cfg, row, col) {
+  var pad = cfg.paddingSize;
+  var rowStride = pad * 2 + cfg.cols;
+  return cfg.apiToFieldIndex[rowStride*(row + pad) + (col + pad)];
 }
 
 export function arrayOfValues(len, value) {

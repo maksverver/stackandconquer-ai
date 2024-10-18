@@ -3,6 +3,8 @@
 //
 // See formatting.js for the opposite.
 
+import {rowColToFieldIndex} from "./util.js";
+
 // Parses a move string into an array [cnt, src, dst], indicating that `cnt`
 // stones are moved from `src` to `dst`. (If a new stone is placed on an empty
 // field, src == dst and cnt == 1.)
@@ -26,6 +28,10 @@ export function parseMove(cfg, move) {
   var c2 = i < move.length ? move.charCodeAt(i++) - 'a'.charCodeAt(0) : c1;
   var r2 = i < move.length ? move.charCodeAt(i++) - '1'.charCodeAt(0) : r1;
   if (cnt > 0 && cnt < cfg.winningHeight && r1 >= 0 && r1 < cfg.rows && c1 >= 0 && c1 < cfg.cols) {
-    return [cnt, r1*cfg.rows + c1, r2*cfg.rows + c2];
+    var i = rowColToFieldIndex(cfg, r1, c1);
+    var j = rowColToFieldIndex(cfg, r2, c2);
+    if (i >= 0 && j >= 0) {
+      return [cnt, i, j];
+    }
   }
 }

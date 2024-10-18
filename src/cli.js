@@ -21,8 +21,17 @@ var helpText = 'StackAndConquer CLI. Supported commands:\n' +
     '          a1 (place a new piece on field a1)\n' +
     '          3a1b2 (move 3 pieces from a1 to b2)\n';
 
+var paddedBoard =
+    '-------' +
+    '-ooooo-' +
+    '-ooooo-' +
+    '-ooooo-' +
+    '-ooooo-' +
+    '-ooooo-' +
+    '-------';
+
 export function run(findBestMoves) {
-  var cfg = createConfig(5, 5, ".........................", '#', '-', 5, 1, 20, 2);
+  var cfg = createConfig(5, 5, paddedBoard, '#', '-', 1, 5, 1, 20, 2);
 
   var undoStack = [];
   var redoStack = [];

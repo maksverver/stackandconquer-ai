@@ -1,5 +1,5 @@
 import {formatRow, formatCol, formatMove, formatMoves} from "./formatting.js";
-import {log, arrayOfValues, arrayOfObjects, randomChoice} from "./util.js";
+import {log, arrayOfValues, arrayOfObjects, randomChoice, rowColToFieldIndex} from "./util.js";
 
 // Move that represents passing (an empty array).
 var PASS = Object.freeze([]);
@@ -265,10 +265,12 @@ function StateImpl(cfg, fields, nextPlayer, lastMove, scoresLeft, occupied, piec
     for (var r = 0; r < cfg.rows; ++r) {
       var line = formatRow(r) + '  ';
       for (var c = 0; c < cfg.cols; ++c) {
-        var src = r*cfg.cols + c;
+        var src = rowColToFieldIndex(cfg, r, c);
         var part = '';
-        if (fields[src].length === 0) {
-          part = '.';
+        if (src === -1) {
+          part = '#';  // not part of the board
+        } else if (fields[src].length === 0) {
+          part = '.';  // empty field
         } else {
           for (var i = 0; i < fields[src].length; ++i) {
             part += String(fields[src][i] + 1);
@@ -276,7 +278,7 @@ function StateImpl(cfg, fields, nextPlayer, lastMove, scoresLeft, occupied, piec
         }
         while (part.length < cfg.winningHeight) part += ' ';
         line += ' ' + part;
-        if (((occupied & (1 << src)) !== 0) != (fields[src].length !== 0)) {
+        if (src !== -1 && ((occupied & (1 << src)) !== 0) != (fields[src].length !== 0)) {
           log('INTERNAL ERROR: occupied does not match fields at ' + src);
         }
       }

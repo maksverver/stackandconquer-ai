@@ -17,12 +17,14 @@ export function callCpuWrapper(jsonBoard, jsonMoves, findBestMoves) {
 
   // Possible optimization: cache this between calls to callCPU(), assuming that
   // the game configuration including board layout does not change in between.
+  var paddingSize = game.getHeightToWin();
   var cfg = createConfig(
-    game.getBoardDimensionY() + 2 * game.getHeightToWin(),
-    game.getBoardDimensionX() + 2 * game.getHeightToWin(),
+    game.getBoardDimensionY(),
+    game.getBoardDimensionX(),
     board,
     game.getOutside(),
     game.getPadding(),
+    paddingSize,
     game.getHeightToWin(),
     game.getTowersToWin(),
     PIECES_PER_PLAYER,
@@ -79,6 +81,7 @@ export function callCpuWrapper(jsonBoard, jsonMoves, findBestMoves) {
     scoresLeft: scoresLeft,
     lastMove: null,  // issue #9
   });
+
   var result = findBestMoves(cfg, state, moves);
   var bestMoves = result[0];
   var bestValue = result[1];
