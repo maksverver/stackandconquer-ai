@@ -4,38 +4,16 @@ import {log, arrayOfValues, arrayOfObjects, randomChoice} from "./util.js";
 // Move that represents passing (an empty array).
 var PASS = Object.freeze([]);
 
-// Constructs a new state, possibly from an old state returned by toJson().
-// Note that inputJson, if given, MUST be valid, or things will get weird!
-export default function State(cfg, inputJson) {
+function cloneArray(arr) {
+  return arr.slice();
+}
 
-  // Pieces on the board. For each field, we store an array of colors 0 and 1.
-  var fields = inputJson ? inputJson.fields : arrayOfObjects(cfg.fieldCount, Array);
+function cloneFields(arr) {
+  return arr.map(cloneArray);
+}
 
-  // Next player to move. Either 0 or 1.
-  var nextPlayer = inputJson ? inputJson.nextPlayer : 0;
-
-  // Number of towers each player needs to win.
-  var scoresLeft = inputJson ? inputJson.scoresLeft : arrayOfValues(cfg.playerCount, cfg.winningScore);
-
-  // Last move played (to prevent reverting)
-  var lastMove = inputJson ? inputJson.lastMove : null;
-
-  // Bitmask of occupied fields.
-  var occupied = 0;
-
-  // Number of pieces per player.
-  var piecesLeft = arrayOfValues(cfg.playerCount, cfg.piecesPerPlayer);
-
-  if (inputJson) {
-    // Recompute `occupied` and `piecesLeft` from given fields.
-    for (var i = 0; i < fields.length; ++i) {
-      var height = fields[i].length;
-      if (height > 0) {
-        occupied |= 1 << i;
-        for (var j = 0; j < height; ++j) --piecesLeft[fields[i][j]];
-      }
-    }
-  }
+// See State() for a description of these parameters.
+function StateImpl(cfg, fields, nextPlayer, lastMove, scoresLeft, occupied, piecesLeft) {
 
   function getNextPlayer() {
     return nextPlayer;
@@ -320,14 +298,12 @@ export default function State(cfg, inputJson) {
   // clone, so it's invalidated when the state changes! To prevent this, the
   // caller should serialize the object to a string.
   function toJson() {
-    return {fields: fields, nextPlayer: nextPlayer, scoresLeft: scoresLeft, lastMove: lastMove};
+    return {fields: fields, nextPlayer: nextPlayer, lastMove: lastMove, scoresLeft: scoresLeft};
   }
 
   function clone() {
-    // TODO: optimize this:
-    //  - do a deep clone that is more efficient that JSON.stringify/parse
-    //  - avoid recalculating `occupied` and `piecesLeft`
-    return State(cfg, JSON.parse(JSON.stringify(toJson())));
+    return StateImpl(cfg, cloneFields(fields), nextPlayer, lastMove,
+        cloneArray(scoresLeft), occupied, cloneArray(piecesLeft));
   }
 
   return {
@@ -343,4 +319,42 @@ export default function State(cfg, inputJson) {
     toJson: toJson,
     clone: clone,
   };
+}
+
+// Constructs a new state, possibly from an old state returned by toJson().
+// Note that inputJson, if given, MUST be valid, or things will get weird!
+export default function State(cfg, inputJson) {
+  if (inputJson == null) {
+    // Pieces on the board. For each field, we store an array of colors 0 and 1.
+    var fields = arrayOfObjects(cfg.fieldCount, Array);
+
+    // Next player to move. Either 0 or 1.
+    var nextPlayer = 0;
+
+    // Last move played (to prevent reverting)
+    var lastMove = null;
+
+    // Number of towers each player needs to win.
+    var scoresLeft = arrayOfValues(cfg.playerCount, cfg.winningScore);
+
+    // Bitmask of occupied fields.
+    var occupied = 0;
+
+    // Number of pieces per player.
+    var piecesLeft = arrayOfValues(cfg.playerCount, cfg.piecesPerPlayer);
+    return StateImpl(cfg, fields, nextPlayer, lastMove, scoresLeft, occupied, piecesLeft);
+  } else {
+    // Recompute `occupied` and `piecesLeft` from given fields.
+    var fields = inputJson.fields;
+    var occupied = 0;
+    var piecesLeft = arrayOfValues(cfg.playerCount, cfg.piecesPerPlayer);
+    for (var i = 0; i < fields.length; ++i) {
+      var height = fields[i].length;
+      if (height > 0) {
+        occupied |= 1 << i;
+        for (var j = 0; j < height; ++j) --piecesLeft[fields[i][j]];
+      }
+    }
+    return StateImpl(cfg, fields, inputJson.nextPlayer, inputJson.lastMove, inputJson.scoresLeft, occupied, piecesLeft);
+  }
 }
