@@ -1,6 +1,8 @@
 ESBUILD ?= node_modules/.bin/esbuild
 
-all: output/MinimaxCPU.js output/MonteCarloCPU.js
+OUTPUTS=output/MinimaxCPU.js output/MonteCarloCPU.js
+
+all: $(OUTPUTS)
 
 output/%-iife.js: src/%.js src/*.js
 	$(ESBUILD) --bundle --target=es5 --format=iife --outfile=$@ $<
@@ -12,6 +14,6 @@ output/%.js: data/%-header.txt output/%-bundle.js
 	cat $^ >$@
 
 clean:
-	rm output/*
+	rm -f -- $(OUTPUTS)
 
 .PHONY: all clean
