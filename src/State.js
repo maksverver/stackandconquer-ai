@@ -246,12 +246,10 @@ function StateImpl(cfg, fields, nextPlayer, lastMove, scoresLeft, occupied, piec
   // This is only used by the Monte Carlo player.
   function randomPlayout(maxSteps) {
     for (var step = 0; step < maxSteps; ++step) {
-      if (getWinner() !== -1) {
-        return;  // game over
-      }
+      if (getWinner() !== -1) return step;  // game over
       playRandomMove();
     }
-    log('WARNING: maxSteps exceeded!');
+    return maxSteps;
   }
 
   // Logs the current state to standard output in a human-readable format.
@@ -303,9 +301,10 @@ function StateImpl(cfg, fields, nextPlayer, lastMove, scoresLeft, occupied, piec
     return {fields: fields, nextPlayer: nextPlayer, lastMove: lastMove, scoresLeft: scoresLeft};
   }
 
-  function clone() {
+  function clone(winningScore) {
     return StateImpl(cfg, cloneFields(fields), nextPlayer, lastMove,
-        cloneArray(scoresLeft), occupied, cloneArray(piecesLeft));
+      winningScore == null ? cloneArray(scoresLeft) : arrayOfValues(cfg.playerCount, winningScore),
+      occupied, cloneArray(piecesLeft));
   }
 
   return {

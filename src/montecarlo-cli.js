@@ -3,6 +3,6 @@
 // Runs the CLI using the Monte Carlo AI.
 
 import {run} from "./cli.js";
-import {findBestMoves} from "./montecarlo.js";
+import {evaluateState, findBestMoves} from "./montecarlo.js";
 
-run(findBestMoves);
+run(evaluateState, findBestMoves);

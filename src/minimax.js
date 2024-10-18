@@ -17,6 +17,10 @@
 // Determines the strength of the AI: higher is better, but slower.
 var SEARCH_DEPTH = 4;
 
+export function evaluateState(state) {
+  return state.evaluate();
+}
+
 // Returns a pair of [list of best moves, best value].
 export function findBestMoves(unusedCfg, state, moves) {
 

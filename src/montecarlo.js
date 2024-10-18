@@ -21,7 +21,7 @@
 //    none are left, and then count how many points each player scored?)
 //
 
-import {arrayOfValues} from "./util.js";
+import {arrayOfValues, log} from "./util.js";
 import State from "./State.js";
 
 // Number of Monte Carlo simulations; higher is better, but slower.
@@ -29,20 +29,30 @@ var TOTAL_SIMULATIONS        = 4000;
 var MIN_SIMULATIONS_PER_MOVE =   10;
 var MAX_STEPS_TO_SIMULATE    =  250;  // used to break out of ties/loops
 
-function evaluateWithRandomPlayouts(player, state, simulations) {
+function evaluateWithRandomPlayouts(player, initialState, simulations) {
   var value = 0.0;
+  var errorPrinted = false;
   for (var n = 0; n < simulations; ++n) {
-    var newState = state.clone();
-    newState.randomPlayout(MAX_STEPS_TO_SIMULATE)
-    var winner = newState.getWinner();
+    // Hack: limit number of towers to win to 1, to increase speed and accuracy.
+    var state = initialState.clone(1);
+    var steps = state.randomPlayout(MAX_STEPS_TO_SIMULATE);
+    if (steps >= MAX_STEPS_TO_SIMULATE && !errorPrinted) {
+      log('WARNING: maxSteps exceeded!');
+      errorPrinted = true;  // only print once
+    }
+    var winner = state.getWinner();
     value += winner === player ? 1.0 : winner === -1 ? 0.5 : 0.0;
   }
   return value / simulations;
 }
 
+export function evaluateState(state) {
+  return evaluateWithRandomPlayouts(state.getNextPlayer(), state, TOTAL_SIMULATIONS);
+}
+
 // Finds the best move among the given `moves` by simulating random playouts.
-export function findBestMoves(cfg, inputState, moves) {
-  var triagedMoves = inputState.triageMoves(moves);
+export function findBestMoves(cfg, state, moves) {
+  var triagedMoves = state.triageMoves(moves);
   if (triagedMoves[0].length > 0) {
     // Winning moves available!
     return [triagedMoves[0], 1.0];
@@ -52,11 +62,6 @@ export function findBestMoves(cfg, inputState, moves) {
     // Only losing moves available.
     return [triagedMoves[2], 0.0];
   }
-
-  // Hack: limit number of towers to win to 1, to increase speed and accuracy.
-  var obj = inputState.clone().toJson();
-  obj.scoresLeft = arrayOfValues(obj.scoresLeft.length, 1);
-  var state = State(cfg, obj);
 
   var player = state.getNextPlayer();
   var simulationsPerMove = Math.max(MIN_SIMULATIONS_PER_MOVE, Math.floor(TOTAL_SIMULATIONS / neutralMoves.length));

@@ -3,6 +3,6 @@
 // Runs the CLI using the Minimax AI.
 
 import {run} from "./cli.js";
-import {findBestMoves} from "./minimax.js";
+import {evaluateState, findBestMoves} from "./minimax.js";
 
-run(findBestMoves);
+run(evaluateState, findBestMoves);

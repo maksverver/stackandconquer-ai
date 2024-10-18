@@ -30,7 +30,7 @@ var paddedBoard =
     '-ooooo-' +
     '-------';
 
-export function run(findBestMoves) {
+export function run(evaluateState, findBestMoves) {
   var cfg = createConfig(5, 5, paddedBoard, '#', '-', 1, 5, 1, 20, 2);
 
   var undoStack = [];
@@ -67,7 +67,7 @@ export function run(findBestMoves) {
         state.debugPrint();
       }
     } else if (line == 'eval') {
-      log(state.evaluate());
+      log(evaluateState(state));
     } else if (line === 'best') {
       var result = findBestMoves(cfg, state, state.generateMoves());
       log(result[0].length + ' best move(s) with value ' + result[1] + ': ' + formatMoves(cfg, result[0]));
