@@ -1,0 +1,20 @@
+{
+  "name": "stackandconquer-ai",
+  "version": "0.0.0",
+  "description": "AI players for StackAndConquer (Mixtour)",
+  "private": true,
+  "scripts": {
+    "build": "echo 'Error: run `make` instead' && exit 1",
+    "test": "echo 'Error: no test specified' && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maksverver/stackandconquer-ai.git"
+  },
+  "type": "module",
+  "author": "Maks Verver",
+  "license": "GPL-3.0-or-later",
+  "devDependencies": {
+    "esbuild": "^0.24.0"
+  }
+}
