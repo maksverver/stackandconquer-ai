@@ -21,8 +21,7 @@
 //    none are left, and then count how many points each player scored?)
 //
 
-import {arrayOfValues, log} from "./util.js";
-import State from "./State.js";
+import {log} from "./util.js";
 
 // Number of Monte Carlo simulations; higher is better, but slower.
 var TOTAL_SIMULATIONS        = 4000;
