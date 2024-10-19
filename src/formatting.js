@@ -20,12 +20,13 @@ export function formatField(cfg, field) {
 
 export function formatMove(cfg, move) {
   if (move.length === 0) return 'pass';
-  var src = formatField(cfg, move[1]);
-  var dst = formatField(cfg, move[2]);
+  var src = move[0];
+  var cnt = move[1];
+  var dst = move[2];
   var res = '';
-  if (move[0] != 1) res += String(move[0]);
-  res += src;
-  if (src !== dst) res += dst;
+  if (cnt !== 1) res += String(cnt);
+  if (src !== -1) res += formatField(cfg, src);
+  res += formatField(cfg, dst);
   return res;
 }
 

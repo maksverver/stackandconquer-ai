@@ -46,13 +46,12 @@ export function callCpuWrapper(jsonBoard, jsonMoves, findBestMoves) {
   var moves = [];
   for (var i = 0; i < legalMoves.length; ++i) {
     var apiMove = legalMoves[i];
-    if (apiMove[0] === -1) {
-      // Place a new piece: [-1, 1, dst] => [1, dst, dst]
-      moves.push([apiMove[1], cfg.apiToFieldIndex[apiMove[2]], cfg.apiToFieldIndex[apiMove[2]]]);
-    } else {
-      // Move a stack: [src, cnt, dst] => [cnt, src, dst]
-      moves.push([apiMove[1], cfg.apiToFieldIndex[apiMove[0]], cfg.apiToFieldIndex[apiMove[2]]]);
-    }
+    var src = apiMove[0];
+    var cnt = apiMove[1];
+    var dst = apiMove[2];
+    if (src !== -1) src = cfg.apiToFieldIndex[src];
+    dst = cfg.apiToFieldIndex[dst];
+    moves.push([src, cnt, dst]);
   }
 
   var fields = [];

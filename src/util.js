@@ -96,7 +96,8 @@ export function fieldIndexToRowCol(cfg, index) {
 export function rowColToFieldIndex(cfg, row, col) {
   var pad = cfg.paddingSize;
   var rowStride = pad * 2 + cfg.cols;
-  return cfg.apiToFieldIndex[rowStride*(row + pad) + (col + pad)];
+  var res = cfg.apiToFieldIndex[rowStride*(row + pad) + (col + pad)];
+  return res == null ? -1 : res;
 }
 
 export function arrayOfValues(len, value) {

@@ -27,16 +27,16 @@ function StateImpl(cfg, fields, nextPlayer, lastMove, scoresLeft, occupied, piec
   function doMoveInternal(move) {
     var removed = null;
     if (move.length !== 0) {
-      var cnt = move[0];
-      var src = move[1];
+      var src = move[0];
+      var cnt = move[1];
       var dst = move[2];
-      var srcField = fields[src];
       var dstField = fields[dst];
-      if (src === dst) {
+      if (src === -1) {
         --piecesLeft[nextPlayer];
         dstField.push(nextPlayer);
         occupied ^= 1 << dst;
       } else {
+        var srcField = fields[src];
         dstField.push.apply(dstField, srcField.splice(srcField.length - cnt));
         if (srcField.length === 0) {
           occupied ^= 1 << src;
@@ -73,16 +73,16 @@ function StateImpl(cfg, fields, nextPlayer, lastMove, scoresLeft, occupied, piec
     --nextPlayer;
     lastMove = undoState[0];
     if (move.length !== 0) {
-      var cnt = move[0];
-      var src = move[1];
+      var src = move[0];
+      var cnt = move[1];
       var dst = move[2];
-      var srcField = fields[src];
       var dstField = fields[dst];
-      if (src === dst) {
+      if (src === -1) {
         ++piecesLeft[nextPlayer];
         dstField.pop();
         occupied ^= 1 << dst;
       } else {
+        var srcField = fields[src];
         var removed = undoState[1];
         if (removed != null) {
           for (var i = 0; i < removed.length; ++i) --piecesLeft[removed[i]];
@@ -151,8 +151,8 @@ function StateImpl(cfg, fields, nextPlayer, lastMove, scoresLeft, occupied, piec
 
   // Generates a list of all possible moves.
   //
-  // A move is a triple [cnt, src, dst], or an empty array [] to pass.
-  // If cnt == 1 and src == dst, a new piece is placed.
+  // A move is a triple [src, cnt, dst], or an empty array [] to pass.
+  // If src === -1 and cnt === 1 and a new piece is placed.
   //
   // Rules of the game:
   //  - https://spielstein.com/games/mixtour/rules (2 players)
@@ -161,17 +161,17 @@ function StateImpl(cfg, fields, nextPlayer, lastMove, scoresLeft, occupied, piec
     if (getWinner() !== -1) return [];  // Game is over
     var moveTemplates = cfg.moves;
     var moves = [];
-    var lastCnt = 0, lastSrc = -1, lastDst = -1;
+    var lastSrc = -1, lastCnt = 0, lastDst = -1;
     if (lastMove != null && lastMove.length != 0) {
-      lastCnt = lastMove[0];
-      lastSrc = lastMove[1];
+      lastSrc = lastMove[0];
+      lastCnt = lastMove[1];
       lastDst = lastMove[2];
     }
     for (var dst = 0; dst < fields.length; ++dst) {
       var dstHeight = fields[dst].length;
       if (dstHeight === 0) {
         if (piecesLeft[nextPlayer]) {
-          moves.push([1, dst, dst]);  // place new piece
+          moves.push([-1, 1, dst]);  // place new piece
         }
       } else {
         var options = moveTemplates[dst][dstHeight];
@@ -181,8 +181,8 @@ function StateImpl(cfg, fields, nextPlayer, lastMove, scoresLeft, occupied, piec
           if (srcHeight !== 0 && (occupied & options[i][1]) === 0) {
             for (var cnt = 1; cnt <= srcHeight; ++cnt) {
               // Do not allow undoing the last move.
-              if (cnt === lastCnt && src == lastDst && dst == lastSrc) continue;
-              moves.push([cnt, src, dst]);  // move pieces
+              if (src == lastDst && cnt === lastCnt && dst == lastSrc) continue;
+              moves.push([src, cnt, dst]);  // move pieces
             }
           }
         }
@@ -195,8 +195,8 @@ function StateImpl(cfg, fields, nextPlayer, lastMove, scoresLeft, occupied, piec
   // Returns the index of the player who wins the tower if this move creates
   // a winning tower, or -1 if it does not.
   function getMoveWinner(move) {
-    if (move.length !== 0 && fields[move[2]].length + move[0] >= cfg.winningHeight) {
-      var srcField = fields[move[1]];
+    if (move.length !== 0 && fields[move[2]].length + move[1] >= cfg.winningHeight) {
+      var srcField = fields[move[0]];
       return srcField[srcField.length - 1];
     }
     return -1;
@@ -336,7 +336,7 @@ export default function State(cfg, inputJson) {
     var lastMove = null;
 
     // Number of towers each player needs to win.
-    var scoresLeft = arrayOfValues(cfg.playerCount, cfg.winningScore);
+    var scoresLeft = arrayOfValues(cfg.playerCount, 1);
 
     // Bitmask of occupied fields.
     var occupied = 0;
