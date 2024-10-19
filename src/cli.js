@@ -31,7 +31,7 @@ var paddedBoard =
     '-------';
 
 export function run(evaluateState, findBestMoves) {
-  var cfg = createConfig(5, 5, paddedBoard, '#', '-', 1, 5, 1, 20, 2);
+  var cfg = createConfig(5, 5, paddedBoard, '#', '-', 1, 5, 20, 2);
 
   var undoStack = [];
   var redoStack = [];
