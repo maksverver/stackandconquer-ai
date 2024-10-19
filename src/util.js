@@ -10,7 +10,7 @@ export var log = typeof game === 'object' ? game.log : console.log;
 // to generate valid moves efficiently.
 export function createConfig(
     rows, cols, inputFields, outside, padding, paddingSize,
-    winningHeight, winningScore, piecesPerPlayer, playerCount) {
+    winningHeight, piecesPerPlayer, playerCount) {
   var paddedRows = rows + 2*paddingSize;
   var paddedCols = cols + 2*paddingSize;
   if (inputFields.length !== paddedRows * paddedCols) {
@@ -71,7 +71,6 @@ export function createConfig(
     fieldCount: fieldCount,
     moves: Object.freeze(moves),
     winningHeight: winningHeight,
-    winningScore: winningScore,
     piecesPerPlayer: piecesPerPlayer,
     playerCount: playerCount,
     // These are only used for move parsing/formatting and debug printing:

@@ -26,7 +26,6 @@ export function callCpuWrapper(jsonBoard, jsonMoves, findBestMoves) {
     game.getPadding(),
     paddingSize,
     game.getHeightToWin(),
-    game.getTowersToWin(),
     PIECES_PER_PLAYER,
     game.getNumOfPlayers(),
   );
@@ -69,16 +68,10 @@ export function callCpuWrapper(jsonBoard, jsonMoves, findBestMoves) {
   }
   if (fields.length !== cfg.fieldCount) throw new Error('Invalid number of fields');
 
-  var scores = game.getScores();
-  var scoresLeft = [];
-  for (var i = 0; i < scores.length; ++i) {
-    scoresLeft.push(cfg.winningScore - scores[i]);
-  }
-
   var state = State(cfg, {
     fields: fields,
     nextPlayer: nextPlayer,
-    scoresLeft: scoresLeft,
+    scoresLeft: game.getTowersNeededToWin(),
     lastMove: null,  // issue #9
   });
 
