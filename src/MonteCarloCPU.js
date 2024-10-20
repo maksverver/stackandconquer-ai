@@ -5,6 +5,6 @@ export function initCPU() {
   // Nothing to be done for now.
 }
 
-export function callCPU(jsonBoard, jsonMoves, nDirection) {
-  return callCpuWrapper(jsonBoard, jsonMoves, findBestMoves);
+export function callCPU(jsonBoard) {
+  return callCpuWrapper(jsonBoard, findBestMoves);
 }

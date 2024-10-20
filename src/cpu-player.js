@@ -8,12 +8,22 @@ import State from "./State.js";
 // game does not pass this information to the CPU players (issue #11).
 export var PIECES_PER_PLAYER = 20;
 
+function convertMoveFromApi(cfg, apiMove) {
+  if (apiMove == null) return null;
+  if (apiMove.length === 0) return apiMove;
+  var src = apiMove[0];
+  var cnt = apiMove[1];
+  var dst = apiMove[2];
+  if (src !== -1) src = cfg.apiToFieldIndex[src];
+  dst = cfg.apiToFieldIndex[dst];
+  return [src, cnt, dst];
+}
+
 // Reconstructs config and state from jsonBoard and jsonMoves, invokes
 // findBestMoves(cfg, state, moves) to list moves, then returns a move selected
 // at random.
-export function callCpuWrapper(jsonBoard, jsonMoves, findBestMoves) {
+export function callCpuWrapper(jsonBoard, findBestMoves) {
   var board = JSON.parse(jsonBoard);
-  var legalMoves = JSON.parse(jsonMoves);
 
   // Possible optimization: cache this between calls to callCPU(), assuming that
   // the game configuration including board layout does not change in between.
@@ -35,24 +45,11 @@ export function callCpuWrapper(jsonBoard, jsonMoves, findBestMoves) {
     throw new Error('Invalid player ID');
   }
 
-  if (legalMoves.length === 0) throw new Error('No moves available');
-  if (legalMoves.length === 1) return legalMoves[0];
-
-  // Convert legal moves from API format. We need to do this because the game
-  // won't tell us what the last move was (issue #9), but it is omitted from the
-  // legal moves. Also, my AI allows building a tower that gives a point to the
-  // opponent while the game does not seem to allow this, so using legalMoves as
-  // the source of truth prevents making moves the game considers illegal.
-  var moves = [];
-  for (var i = 0; i < legalMoves.length; ++i) {
-    var apiMove = legalMoves[i];
-    var src = apiMove[0];
-    var cnt = apiMove[1];
-    var dst = apiMove[2];
-    if (src !== -1) src = cfg.apiToFieldIndex[src];
-    dst = cfg.apiToFieldIndex[dst];
-    moves.push([src, cnt, dst]);
-  }
+  // Convert legal moves from API format to ensure we never make illegal moves.
+  var apiMoves = JSON.parse(game.getLegalMoves());
+  if (apiMoves.length === 0) throw new Error('No moves available');
+  if (apiMoves.length === 1) return apiMoves[0];
+  var moves = apiMoves.map(convertMoveFromApi.bind(null, cfg));
 
   var fields = [];
   for (var i = 0; i < cfg.fieldCount; ++i) {
@@ -71,7 +68,7 @@ export function callCpuWrapper(jsonBoard, jsonMoves, findBestMoves) {
     fields: fields,
     nextPlayer: nextPlayer,
     scoresLeft: game.getTowersNeededToWin(),
-    lastMove: null,  // issue #9
+    lastMove: convertMoveFromApi(game.getLastMove()),
   });
 
   var result = findBestMoves(cfg, state, moves);
@@ -82,5 +79,5 @@ export function callCpuWrapper(jsonBoard, jsonMoves, findBestMoves) {
       formatMoves(cfg, bestMoves) + '; selected ' + formatMove(cfg, bestMove) + ' at random');
   var moveIndex = indexOfMove(moves, bestMove);
   if (moveIndex < 0) throw new Error('Best move not found somehow?!');
-  return legalMoves[moveIndex];
+  return apiMoves[moveIndex];
 }
