@@ -3,7 +3,7 @@
 // Execute 'help' for a list of commands
 
 import readline from "node:readline";
-import State from "./State.js";
+import {createInitialState} from "./State.js";
 import {createConfig, indexOfMove, log} from "./util.js";
 import {formatMoves} from "./formatting.js";
 import {parseMove} from "./parsing.js";
@@ -31,11 +31,12 @@ var paddedBoard =
     '-------';
 
 export function run(evaluateState, findBestMoves) {
-  var cfg = createConfig(5, 5, paddedBoard, '#', '-', 1, 5, 20, 2);
+  var cfg = createConfig(5, 5, paddedBoard, '#', '-', 1, 5, 2);
 
   var undoStack = [];
   var redoStack = [];
-  var state = State(cfg);
+
+  var state = createInitialState(cfg);
   state.debugPrint();
 
   var currentLineHandler = defaultLineHandler;

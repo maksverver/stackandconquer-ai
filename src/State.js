@@ -12,8 +12,22 @@ function cloneFields(arr) {
   return arr.map(cloneArray);
 }
 
-// See State() for a description of these parameters.
-function StateImpl(cfg, fields, nextPlayer, lastMove, scoresLeft, occupied, piecesLeft) {
+function State(
+  // Game configuration object as returned by createConfig()
+  cfg,
+  // Array of fields. Each field is an array with pieces (numbers 0 through 2)
+  fields,
+  // Next player to move (number 0 through 2)
+  nextPlayer,
+  // Last move played (to prevent reverting, which is illegal) or null
+  lastMove,
+  // Array of number of pieces left to place, per player
+  piecesLeft,
+  // Number of towers each player still needs to conquery to win
+  scoresLeft,
+  // Bitmask of occupied fields
+  occupied,
+) {
 
   function getNextPlayer() {
     return nextPlayer;
@@ -298,13 +312,19 @@ function StateImpl(cfg, fields, nextPlayer, lastMove, scoresLeft, occupied, piec
   // clone, so it's invalidated when the state changes! To prevent this, the
   // caller should serialize the object to a string.
   function toJson() {
-    return {fields: fields, nextPlayer: nextPlayer, lastMove: lastMove, scoresLeft: scoresLeft};
+    return {
+      fields: fields,
+      nextPlayer: nextPlayer,
+      lastMove: lastMove,
+      scoresLeft: scoresLeft,
+      piecesLeft: piecesLeft,
+    };
   }
 
   function clone(winningScore) {
-    return StateImpl(cfg, cloneFields(fields), nextPlayer, lastMove,
+    return State(cfg, cloneFields(fields), nextPlayer, lastMove, cloneArray(piecesLeft),
       winningScore == null ? cloneArray(scoresLeft) : arrayOfValues(cfg.playerCount, winningScore),
-      occupied, cloneArray(piecesLeft));
+      occupied);
   }
 
   return {
@@ -322,40 +342,42 @@ function StateImpl(cfg, fields, nextPlayer, lastMove, scoresLeft, occupied, piec
   };
 }
 
-// Constructs a new state, possibly from an old state returned by toJson().
-// Note that inputJson, if given, MUST be valid, or things will get weird!
-export default function State(cfg, inputJson) {
-  if (inputJson == null) {
-    // Pieces on the board. For each field, we store an array of colors 0 and 1.
-    var fields = arrayOfObjects(cfg.fieldCount, Array);
-
-    // Next player to move. Either 0 or 1.
-    var nextPlayer = 0;
-
-    // Last move played (to prevent reverting)
-    var lastMove = null;
-
-    // Number of towers each player needs to win.
-    var scoresLeft = arrayOfValues(cfg.playerCount, 1);
-
-    // Bitmask of occupied fields.
-    var occupied = 0;
-
-    // Number of pieces per player.
-    var piecesLeft = arrayOfValues(cfg.playerCount, cfg.piecesPerPlayer);
-    return StateImpl(cfg, fields, nextPlayer, lastMove, scoresLeft, occupied, piecesLeft);
-  } else {
-    // Recompute `occupied` and `piecesLeft` from given fields.
-    var fields = inputJson.fields;
-    var occupied = 0;
-    var piecesLeft = arrayOfValues(cfg.playerCount, cfg.piecesPerPlayer);
-    for (var i = 0; i < fields.length; ++i) {
-      var height = fields[i].length;
-      if (height > 0) {
-        occupied |= 1 << i;
-        for (var j = 0; j < height; ++j) --piecesLeft[fields[i][j]];
-      }
-    }
-    return StateImpl(cfg, fields, inputJson.nextPlayer, inputJson.lastMove, inputJson.scoresLeft, occupied, piecesLeft);
+// Creates a state from an object in the same format as produced by toJson(),
+// defined above.
+//
+// Note: the new state takes ownership of mutable inputJson members like
+// `fields`, `piecesLeft`, and `scoresLeft`, so the caller should have
+// deep-cloned the input JSON before passing it to this function, and not use
+// the object afterwards.
+export function createStateFromJson(cfg, inputJson) {
+  // Recompute `occupied` from given fields.
+  var fields = inputJson.fields;
+  var occupied = 0;
+  for (var i = 0; i < fields.length; ++i) {
+    if (fields[i].length > 0) occupied |= 1 << i;
   }
+  return State(cfg, fields, inputJson.nextPlayer, inputJson.lastMove, inputJson.piecesLeft, inputJson.scoresLeft, occupied);
+}
+
+// Creates an initial state with an empty board using the given configuration.
+//
+// piecesLeft can be left undefined to use the default of 20 pieces for a two-
+// player game, or 15 pieces for a three-player game, or set to a single number
+// that applies to all players, or array of length cfg.playerCount with the
+// specific number of pieces per player.
+//
+// Similarly, scoresLeft can be left undefined to use the default of 1 tower
+// needed to win, or set to a number that applies to all players equally, or an
+// array of length cfg.playerCount  with the number of towers to score per
+// player.
+export function createInitialState(cfg, piecesLeft, scoresLeft) {
+  if (piecesLeft == null) piecesLeft = cfg.playerCount <= 2 ? 20 : 15;
+  if (typeof piecesLeft === 'number') piecesLeft = arrayOfValues(cfg.playerCount, piecesLeft);
+  if (scoresLeft == null) scoresLeft = 1;
+  if (typeof scoresLeft === 'number') scoresLeft = arrayOfValues(cfg.playerCount, scoresLeft);
+  var fields = arrayOfObjects(cfg.fieldCount, Array);
+  var nextPlayer = 0;
+  var lastMove = null;
+  var occupied = 0;
+  return State(cfg, fields, nextPlayer, lastMove, piecesLeft, scoresLeft, occupied);
 }

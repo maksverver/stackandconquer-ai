@@ -2,11 +2,7 @@
 
 import {formatMove, formatMoves} from "./formatting.js";
 import {createConfig, indexOfMove, log, randomChoice} from "./util.js";
-import State from "./State.js";
-
-// Number of pieces per player. This should be configurable, but currently the
-// game does not pass this information to the CPU players (issue #11).
-export var PIECES_PER_PLAYER = 20;
+import {createStateFromJson} from "./State.js";
 
 function convertMoveFromApi(cfg, apiMove) {
   if (apiMove == null) return null;
@@ -28,7 +24,6 @@ export function initCpuWrapper(jsonBoard) {
     game.getPadding(),
     game.getHeightToWin(),  // padding size
     game.getHeightToWin(),
-    PIECES_PER_PLAYER,
     game.getNumOfPlayers(),
   );
 }
@@ -63,9 +58,10 @@ export function callCpuWrapper(findBestMoves, cfg, jsonBoard) {
   }
   if (fields.length !== cfg.fieldCount) throw new Error('Invalid number of fields');
 
-  var state = State(cfg, {
+  var state = createStateFromJson(cfg, {
     fields: fields,
     nextPlayer: nextPlayer,
+    piecesLeft: game.getNumberOfStones(),
     scoresLeft: game.getTowersNeededToWin(),
     lastMove: convertMoveFromApi(game.getLastMove()),
   });
