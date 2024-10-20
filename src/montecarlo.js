@@ -23,15 +23,16 @@
 
 import {log} from "./util.js";
 
-// Number of Monte Carlo simulations; higher is better, but slower.
-var TOTAL_SIMULATIONS        = 4000;
-var MIN_SIMULATIONS_PER_MOVE =   10;
-var MAX_STEPS_TO_SIMULATE    =  250;  // used to break out of ties/loops
+// Number of Monte Carlo simulation steps; higher is better, but slower.
+var TOTAL_BUDGET           = 50000;
+var MIN_BUDGET_PER_MOVE    =   500;
+var MAX_STEPS_TO_SIMULATE  =   250;  // used to break out of ties/loops
 
-function evaluateWithRandomPlayouts(player, initialState, simulations) {
+function evaluateWithRandomPlayouts(player, initialState, budget) {
   var value = 0.0;
   var errorPrinted = false;
-  for (var n = 0; n < simulations; ++n) {
+  var simulations = 0;
+  while (budget > 0) {
     // Hack: limit number of towers to win to 1, to increase speed and accuracy.
     var state = initialState.clone(1);
     var steps = state.randomPlayout(MAX_STEPS_TO_SIMULATE);
@@ -41,12 +42,14 @@ function evaluateWithRandomPlayouts(player, initialState, simulations) {
     }
     var winner = state.getWinner();
     value += winner === player ? 1.0 : winner === -1 ? 0.5 : 0.0;
+    simulations += 1;
+    budget -= steps + 1;
   }
   return value / simulations;
 }
 
 export function evaluateState(state) {
-  return evaluateWithRandomPlayouts(state.getNextPlayer(), state, TOTAL_SIMULATIONS);
+  return evaluateWithRandomPlayouts(state.getNextPlayer(), state, TOTAL_BUDGET);
 }
 
 // Finds the best move among the given `moves` by simulating random playouts.
@@ -63,7 +66,7 @@ export function findBestMoves(cfg, state, moves) {
   }
 
   var player = state.getNextPlayer();
-  var simulationsPerMove = Math.max(MIN_SIMULATIONS_PER_MOVE, Math.floor(TOTAL_SIMULATIONS / neutralMoves.length));
+  var simulationsPerMove = Math.max(MIN_BUDGET_PER_MOVE, Math.floor(TOTAL_BUDGET / neutralMoves.length));
   var bestMoves = [];
   var bestValue = 0.0;
   for (var i = 0; i < neutralMoves.length; ++i) {
