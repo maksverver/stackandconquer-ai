@@ -1,10 +1,13 @@
 import {findBestMoves} from "./montecarlo.js";
-import {callCpuWrapper} from "./cpu-player.js";
+import {callCpuWrapper, initCpuWrapper} from "./cpu-player.js";
 
-export function initCPU() {
-  // Nothing to be done for now.
+var cfg = null;
+
+export function initCPU(jsonBoard) {
+  cfg = initCpuWrapper(jsonBoard);
 }
 
 export function callCPU(jsonBoard) {
-  return callCpuWrapper(jsonBoard, findBestMoves);
+  if (cfg == null) throw new Error('initCPU() has not been called!');
+  return callCpuWrapper(findBestMoves, cfg, jsonBoard);
 }

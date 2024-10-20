@@ -19,26 +19,25 @@ function convertMoveFromApi(cfg, apiMove) {
   return [src, cnt, dst];
 }
 
-// Reconstructs config and state from jsonBoard and jsonMoves, invokes
-// findBestMoves(cfg, state, moves) to list moves, then returns a move selected
-// at random.
-export function callCpuWrapper(jsonBoard, findBestMoves) {
-  var board = JSON.parse(jsonBoard);
-
-  // Possible optimization: cache this between calls to callCPU(), assuming that
-  // the game configuration including board layout does not change in between.
-  var paddingSize = game.getHeightToWin();
-  var cfg = createConfig(
+export function initCpuWrapper(jsonBoard) {
+  return createConfig(
     game.getBoardDimensionY(),
     game.getBoardDimensionX(),
-    board,
+    JSON.parse(jsonBoard),
     game.getOutside(),
     game.getPadding(),
-    paddingSize,
+    game.getHeightToWin(),  // padding size
     game.getHeightToWin(),
     PIECES_PER_PLAYER,
     game.getNumOfPlayers(),
   );
+}
+
+// Reconstructs config and state from jsonBoard and jsonMoves, invokes
+// findBestMoves(cfg, state, moves) to list moves, then returns a move selected
+// at random.
+export function callCpuWrapper(findBestMoves, cfg, jsonBoard) {
+  var board = JSON.parse(jsonBoard);
 
   var nextPlayer = game.getID() - 1;
   if (!Number.isInteger(nextPlayer) || nextPlayer < 0 || nextPlayer >= cfg.playerCount) {
