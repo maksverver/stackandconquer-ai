@@ -17,7 +17,7 @@
   "license": "GPL-3.0-or-later",
   "devDependencies": {
     "@eslint/js": "^9.13.0",
-    "esbuild": "^0.24.0",
-    "eslint": "^9.13.0"
+    "eslint": "^9.13.0",
+    "rollup": "^4.24.0"
   }
 }

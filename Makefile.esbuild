@@ -1,0 +1,29 @@
+# Alternative Makefile that uses esbuild instead of rollup
+#
+# I prefer rollup because it preserves more of the comments and formatting,
+# but esbuild works too, and it is somewhat faster.
+#
+# To use this, first install esbuild by running:
+#
+#   npm install esbuild --dev
+#
+
+ESBUILD ?= node_modules/.bin/esbuild
+
+OUTPUTS=output/MinimaxCPU.js output/MonteCarloCPU.js
+
+all: $(OUTPUTS)
+
+output/%-iife.js: src/%.js src/*.js
+	$(ESBUILD) --bundle --target=es6 --format=iife --outfile=$@ $<
+
+output/%-bundle.js: output/%-iife.js
+	sed -e '/^(() => {$$/d; s/^  //; /})();/d' $< >$@
+
+output/%.js: data/%-header.txt output/%-bundle.js
+	cat $^ >$@
+
+clean:
+	rm -f -- $(OUTPUTS)
+
+.PHONY: all clean
