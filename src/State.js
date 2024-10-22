@@ -131,58 +131,6 @@ class State {
     }
   }
 
-  // Heuristically evaluates the state with respect to the next player.
-  //
-  // The current evaluation function is not highly optimized. It can probably
-  // be optimized significantly.
-  //
-  // This only works for 2 players and is only used by the Minimax player.
-  evaluate() {
-    const winner = this.getWinner();
-    if (winner !== -1) {
-      return winner === this.nextPlayer ? 1000000000 : -1000000000;
-    }
-    const {cfg, nextPlayer, fields, occupied, scoresLeft} = this;
-    const {moves: moveTemplates, winningHeight} = cfg;
-    let score = 10000 * (scoresLeft[1 - nextPlayer] - scoresLeft[nextPlayer]);
-    for (let dst = 0; dst < fields.length; ++dst) {
-      const dstField = fields[dst];
-      const dstHeight = dstField.length;
-      if (dstHeight > 0) {
-        const options = moveTemplates[dst][dstHeight];
-        for (const [src, mask] of options) {
-          const srcField = fields[src];
-          const srcHeight = srcField.length;
-          if (srcHeight + dstHeight >= winningHeight && (occupied & mask) === 0) {
-            if (srcField[srcHeight - 1] === nextPlayer) {
-              // Winning move found!
-              score += 1000;
-            } else {
-              // Winning move for opponent (though I might still be able to prevent it).
-              // Possible improvement: check if I have moves to prevent it.
-              score -= 100;
-            }
-          }
-        }
-        // Reward piece on top of a tower.
-        if (dstField[dstHeight - 1] === nextPlayer) {
-          score += 10 * dstHeight;
-        } else {
-          score -= 10 * dstHeight;
-        }
-        // Reward pieces on the board.
-        for (let i = 0; i < dstHeight; ++i) {
-          if (dstField[i] === nextPlayer) {
-            score += 1 + i;
-          } else {
-            score -= 1 + i;
-          }
-        }
-      }
-    }
-    return score;
-  }
-
   // Generates a list of all possible moves.
   //
   // A move is a triple [src, cnt, dst], or an empty array [] to pass.
@@ -227,100 +175,6 @@ class State {
     return moves;
   }
 
-  // Classifies the given list of moves into three types: winning, neutral and
-  // losing. This is only used by the Monte Carlo player.
-  triageMoves(moves) {
-    const fields = this.fields;
-    const winningHeight = this.cfg.winningHeight;
-    const winningMoves = [];
-    const neutralMoves = [];
-    const losingMoves = [];
-    for (const move of moves) {
-      if (move.length !== 0 && fields[move[2]].length + move[1] >= winningHeight) {
-        const srcField = fields[move[0]];
-        if (srcField[srcField.length - 1] === this.nextPlayer) {
-          winningMoves.push(move);
-        } else {
-          losingMoves.push(move);
-        }
-      } else {
-        neutralMoves.push(move);
-      }
-    }
-    return [winningMoves, neutralMoves, losingMoves];
-  }
-
-  // Plays a mostly-random move, using the following heuristic: play a winning
-  // move if it exists, don't play an immediately losing move if it can be
-  // avoided, and otherwise play randomly.
-  //
-  // This is only used by the Monte Carlo player.
-  _playRandomMove() {
-    const triagedMoves = this.triageMoves(this.generateMoves());
-    for (const moves of triagedMoves) {
-      if (moves.length > 0) {
-        const choice = randomChoice(moves);
-        this.doMove(choice);
-        return;
-      }
-    }
-    // This should never happen, since "pass" is also a neutral move, unless
-    // this function is called when the game is already over.
-    throw new Error('No moves available!');
-  }
-
-  // Simulates a random playout. Returns the number of moves played.
-  //
-  // This is only used by the Monte Carlo player.
-  randomPlayout(maxSteps) {
-    for (let step = 0; step < maxSteps; ++step) {
-      if (this.getWinner() !== -1) return step;  // game over
-      this._playRandomMove();
-    }
-    return maxSteps;
-  }
-
-  // Logs the current state to standard output in a human-readable format.
-  debugPrint() {
-    const {cfg, fields, occupied, lastMove, nextPlayer, scoresLeft, piecesLeft} = this;
-    const {rows, cols, winningHeight} = cfg;
-    log('Scores left: ' + scoresLeft);
-    log('Pieces left: ' + piecesLeft);
-    log('Player ' + (nextPlayer + 1) + ' to move.');
-    for (let r = 0; r < rows; ++r) {
-      let line = formatRow(r) + '  ';
-      for (let c = 0; c < cols; ++c) {
-        const src = rowColToFieldIndex(cfg, r, c);
-        let part = '';
-        if (src === -1) {
-          part = '#';  // not part of the board
-        } else if (fields[src].length === 0) {
-          part = '.';  // empty field
-        } else {
-          for (let i = 0; i < fields[src].length; ++i) {
-            part += String(fields[src][i] + 1);
-          }
-        }
-        while (part.length < winningHeight) part += ' ';
-        line += ' ' + part;
-        if (src !== -1 && ((occupied & (1 << src)) !== 0) != (fields[src].length !== 0)) {
-          log('INTERNAL ERROR: occupied does not match fields at ' + src);
-        }
-      }
-      log(line);
-    }
-    let line = '   ';
-    for (let c = 0; c < cols; ++c) {
-      let part = formatCol(c);
-      while (part.length < winningHeight) part += ' ';
-      line += ' ' + part;
-    }
-    log(line);
-    log('last move: ' + (lastMove ? formatMove(cfg, lastMove) : 'none'));
-    const moves = this.generateMoves();
-    log(moves.length + ' possible moves: ' + formatMoves(cfg, moves));
-  }
-
   // Returns the state as a JSON-serializable object. This does not do a deep
   // clone, so it's invalidated when the state changes! To prevent this, the
   // caller should serialize the object to a string.
@@ -346,6 +200,113 @@ class State {
       scoresLeft,
       this.occupied);
   }
+}
+
+// Heuristically evaluates the state with respect to the next player, without
+// searching more deeply. (Although this function does look for possible moves
+// that are immedaitely winning.)
+//
+// The current evaluation function is not highly optimized. It can probably
+// be optimized significantly.
+//
+// This only works for 2 players and is only used by the Minimax player.
+export function evaluateImmediately(state) {
+  const winner = state.getWinner();
+  if (winner !== -1) {
+    return winner === state.nextPlayer ? 1000000000 : -1000000000;
+  }
+  const {cfg, nextPlayer, fields, occupied, scoresLeft} = state;
+  const {moves: moveTemplates, winningHeight} = cfg;
+  let score = 10000 * (scoresLeft[1 - nextPlayer] - scoresLeft[nextPlayer]);
+  for (let dst = 0; dst < fields.length; ++dst) {
+    const dstField = fields[dst];
+    const dstHeight = dstField.length;
+    if (dstHeight > 0) {
+      const options = moveTemplates[dst][dstHeight];
+      for (const [src, mask] of options) {
+        const srcField = fields[src];
+        const srcHeight = srcField.length;
+        if (srcHeight + dstHeight >= winningHeight && (occupied & mask) === 0) {
+          if (srcField[srcHeight - 1] === nextPlayer) {
+            // Winning move found!
+            score += 1000;
+          } else {
+            // Winning move for opponent (though I might still be able to prevent it).
+            // Possible improvement: check if I have moves to prevent it.
+            score -= 100;
+          }
+        }
+      }
+      // Reward piece on top of a tower.
+      if (dstField[dstHeight - 1] === nextPlayer) {
+        score += 10 * dstHeight;
+      } else {
+        score -= 10 * dstHeight;
+      }
+      // Reward pieces on the board.
+      for (let i = 0; i < dstHeight; ++i) {
+        if (dstField[i] === nextPlayer) {
+          score += 1 + i;
+        } else {
+          score -= 1 + i;
+        }
+      }
+    }
+  }
+  return score;
+}
+
+// Classifies the given list of moves into three types: winning, neutral and
+// losing. This is only used by the Monte Carlo player.
+export function triageMoves(state, moves) {
+  const {cfg, fields, nextPlayer} = state;
+  const {winningHeight} = cfg;
+  const winningMoves = [];
+  const neutralMoves = [];
+  const losingMoves = [];
+  for (const move of moves) {
+    if (move.length !== 0 && fields[move[2]].length + move[1] >= winningHeight) {
+      const srcField = fields[move[0]];
+      if (srcField[srcField.length - 1] === nextPlayer) {
+        winningMoves.push(move);
+      } else {
+        losingMoves.push(move);
+      }
+    } else {
+      neutralMoves.push(move);
+    }
+  }
+  return [winningMoves, neutralMoves, losingMoves];
+}
+
+// Plays a mostly-random move, using the following heuristic: play a winning
+// move if it exists, don't play an immediately losing move if it can be
+// avoided, and otherwise play randomly.
+//
+// This is only used by the Monte Carlo player.
+function playRandomMove(state, allMoves) {
+  for (const moves of triageMoves(state, allMoves)) {
+    if (moves.length > 0) {
+      const choice = randomChoice(moves);
+      state.doMove(choice);
+      return;
+    }
+  }
+  // This should never happen, since "pass" is also a neutral move, unless
+  // this function is called when the game is already over.
+  throw new Error('No moves available!');
+}
+
+// Simulates a random playout. Returns the number of moves played.
+//
+// This is only used by the Monte Carlo player.
+export function randomPlayout(state, maxSteps) {
+  for (let step = 0; step < maxSteps; ++step) {
+    const moves = state.generateMoves();
+    if (moves.length === 0) return step;  // game over
+    playRandomMove(state, moves);
+  }
+  return maxSteps;
 }
 
 // Creates a state from an object in the same format as produced by toJson(),
@@ -386,4 +347,45 @@ export function createInitialState(cfg, piecesLeft, scoresLeft) {
   const lastMove = null;
   const occupied = 0;
   return new State(cfg, fields, nextPlayer, lastMove, piecesLeft, scoresLeft, occupied);
+}
+
+// Logs the current state to standard output in a human-readable format.
+export function debugPrint(state) {
+  const {cfg, fields, occupied, lastMove, nextPlayer, scoresLeft, piecesLeft} = state;
+  const {rows, cols, winningHeight} = cfg;
+  log('Scores left: ' + scoresLeft);
+  log('Pieces left: ' + piecesLeft);
+  log('Player ' + (nextPlayer + 1) + ' to move.');
+  for (let r = 0; r < rows; ++r) {
+    let line = formatRow(r) + '  ';
+    for (let c = 0; c < cols; ++c) {
+      const src = rowColToFieldIndex(cfg, r, c);
+      let part = '';
+      if (src === -1) {
+        part = '#';  // not part of the board
+      } else if (fields[src].length === 0) {
+        part = '.';  // empty field
+      } else {
+        for (let i = 0; i < fields[src].length; ++i) {
+          part += String(fields[src][i] + 1);
+        }
+      }
+      while (part.length < winningHeight) part += ' ';
+      line += ' ' + part;
+      if (src !== -1 && ((occupied & (1 << src)) !== 0) != (fields[src].length !== 0)) {
+        log('INTERNAL ERROR: occupied does not match fields at ' + src);
+      }
+    }
+    log(line);
+  }
+  let line = '   ';
+  for (let c = 0; c < cols; ++c) {
+    let part = formatCol(c);
+    while (part.length < winningHeight) part += ' ';
+    line += ' ' + part;
+  }
+  log(line);
+  log('last move: ' + (lastMove ? formatMove(cfg, lastMove) : 'none'));
+  const moves = state.generateMoves();
+  log(moves.length + ' possible moves: ' + formatMoves(cfg, moves));
 }

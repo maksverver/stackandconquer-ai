@@ -14,23 +14,23 @@
 //  - add a transposition table?
 //
 
+import {evaluateImmediately} from "./State.js";
+
 // Determines the strength of the AI: higher is better, but slower.
 const SEARCH_DEPTH = 4;
 
-export function evaluateState(state) {
-  return state.evaluate();
-}
+export const evaluateState = evaluateImmediately;
 
 // Returns a pair of [list of best moves, best value].
 export function findBestMoves(unusedCfg, state, moves) {
   function search(depthLeft, alpha, beta) {
     if (depthLeft === 0) {
-      return state.evaluate();
+      return evaluateImmediately(state);
     }
     const moves = state.generateMoves();
     if (moves.length === 0) {
       // Game is over. Adjust value by `depthLeft` to reward quicker wins.
-      let value = state.evaluate();
+      let value = evaluateImmediately(state);
       if (value > 0) value += depthLeft;
       if (value < 0) value -= depthLeft;
       return value;

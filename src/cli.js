@@ -4,7 +4,7 @@
 
 import process from 'node:process';
 import readline from "node:readline";
-import {createInitialState, createStateFromJson} from "./State.js";
+import {createInitialState, createStateFromJson, debugPrint} from "./State.js";
 import {createConfig, indexOfMove, log} from "./util.js";
 import {formatMoves} from "./formatting.js";
 import {parseMove} from "./parsing.js";
@@ -38,7 +38,7 @@ export function run(evaluateState, findBestMoves) {
   const redoStack = [];
 
   let state = createInitialState(cfg);
-  state.debugPrint();
+  debugPrint(state);
 
   let currentLineHandler = defaultLineHandler;
 
@@ -57,7 +57,7 @@ export function run(evaluateState, findBestMoves) {
         const item = undoStack.pop();
         redoStack.push(item[0]);
         state.undoMove(item[0], item[1]);
-        state.debugPrint();
+        debugPrint(state);
       }
     } else if (line === 'redo') {
       if (redoStack.length === 0) {
@@ -66,7 +66,7 @@ export function run(evaluateState, findBestMoves) {
         const move = redoStack.pop();
         const undoState = state.doMove(move);
         undoStack.push([move, undoState]);
-        state.debugPrint();
+        debugPrint(state);
       }
     } else if (line == 'eval') {
       log(evaluateState(state));
@@ -83,7 +83,7 @@ export function run(evaluateState, findBestMoves) {
         const undoState = state.doMove(move);
         undoStack.push([move, undoState]);
         redoStack.length = 0;
-        state.debugPrint();
+        debugPrint(state);
       }
     }
   }

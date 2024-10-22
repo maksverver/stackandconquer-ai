@@ -22,6 +22,7 @@
 //
 
 import {log} from "./util.js";
+import {randomPlayout, triageMoves} from "./State.js";
 
 // Number of Monte Carlo simulation steps; higher is better, but slower.
 const TOTAL_BUDGET           = 50000;
@@ -35,7 +36,7 @@ function evaluateWithRandomPlayouts(player, initialState, budget) {
   while (budget > 0) {
     // Hack: limit number of towers to win to 1, to increase speed and accuracy.
     const state = initialState.clone(1);
-    const steps = state.randomPlayout(MAX_STEPS_TO_SIMULATE);
+    const steps = randomPlayout(state, MAX_STEPS_TO_SIMULATE);
     if (steps >= MAX_STEPS_TO_SIMULATE && !errorPrinted) {
       log('WARNING: maxSteps exceeded!');
       errorPrinted = true;  // only print once
@@ -53,8 +54,8 @@ export function evaluateState(state) {
 }
 
 // Finds the best move among the given `moves` by simulating random playouts.
-export function findBestMoves(cfg, state, moves) {
-  const triagedMoves = state.triageMoves(moves);
+export function findBestMoves(unusedCfg, state, moves) {
+  const triagedMoves = triageMoves(state, moves);
   if (triagedMoves[0].length > 0) {
     // Winning moves available!
     return [triagedMoves[0], 1.0];
