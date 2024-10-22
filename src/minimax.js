@@ -23,7 +23,6 @@ export function evaluateState(state) {
 
 // Returns a pair of [list of best moves, best value].
 export function findBestMoves(unusedCfg, state, moves) {
-
   function search(depthLeft, alpha, beta) {
     if (depthLeft === 0) {
       return state.evaluate();
@@ -37,8 +36,7 @@ export function findBestMoves(unusedCfg, state, moves) {
       return value;
     }
     let bestValue = -Infinity;
-    for (let i = 0; i < moves.length; ++i) {
-      const move = moves[i];
+    for (const move of moves) {
       const undoState = state.doMove(move);
       const value = -search(depthLeft - 1, -beta, -alpha);
       state.undoMove(move, undoState);
@@ -53,8 +51,7 @@ export function findBestMoves(unusedCfg, state, moves) {
 
   const bestMoves = [];
   let bestValue = -Infinity;
-  for (let i = 0; i < moves.length; ++i) {
-    const move = moves[i];
+  for (const move of moves) {
     const undoState = state.doMove(move);
     const value = -search(SEARCH_DEPTH - 1, -Infinity, -bestValue + 1);
     state.undoMove(move, undoState);

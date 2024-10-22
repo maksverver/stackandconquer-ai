@@ -69,8 +69,7 @@ export function findBestMoves(cfg, state, moves) {
   const simulationsPerMove = Math.max(MIN_BUDGET_PER_MOVE, Math.floor(TOTAL_BUDGET / neutralMoves.length));
   const bestMoves = [];
   let bestValue = 0.0;
-  for (let i = 0; i < neutralMoves.length; ++i) {
-    const move = neutralMoves[i];
+  for (const move of neutralMoves) {
     const undoState = state.doMove(move);
     const value = evaluateWithRandomPlayouts(player, state, simulationsPerMove);
     state.undoMove(move, undoState);

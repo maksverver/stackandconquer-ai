@@ -240,8 +240,7 @@ class State {
     const winningMoves = [];
     const neutralMoves = [];
     const losingMoves = [];
-    for (let i = 0; i < moves.length; ++i) {
-      const move = moves[i];
+    for (const move of moves) {
       if (move.length !== 0 && fields[move[2]].length + move[1] >= winningHeight) {
         const srcField = fields[move[0]];
         if (srcField[srcField.length - 1] === this.nextPlayer) {
@@ -263,8 +262,7 @@ class State {
   // This is only used by the Monte Carlo player.
   _playRandomMove() {
     const triagedMoves = this.triageMoves(this.generateMoves());
-    for (let i = 0; i < triagedMoves.length; ++i) {
-      const moves = triagedMoves[i];
+    for (const moves of triagedMoves) {
       if (moves.length > 0) {
         const choice = randomChoice(moves);
         this.doMove(choice);
