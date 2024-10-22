@@ -38,9 +38,26 @@ function State(
     return scoresLeft.indexOf(0);
   }
 
+  function incNextPlayer() {
+    ++nextPlayer;
+    if (nextPlayer === cfg.playerCount) nextPlayer = 0;
+}
+
+  function decNextPlayer() {
+    if (nextPlayer === 0) nextPlayer = cfg.playerCount;
+    --nextPlayer;
+  }
+
   function doMoveInternal(move) {
+    // This implementation is essentially reversed in undoMove(). Keep the
+    // implementations in sync.
     var removed = null;
-    if (move.length !== 0) {
+    if (move.length === 0) {
+      // Pass. Play returns to the *previous* player (which is the same as the
+      // next player in a 2-player game).
+      decNextPlayer();
+      // Open question: should we update lastMove in this case?
+    } else {
       var src = move[0];
       var cnt = move[1];
       var dst = move[2];
@@ -63,11 +80,10 @@ function State(
           for (var i = 0; i < removed.length; ++i) ++piecesLeft[removed[i]];
         }
       }
-      ++nextPlayer;
-      if (nextPlayer === cfg.playerCount) nextPlayer = 0;
+      incNextPlayer();
       lastMove = move;
-      return removed;
     }
+    return removed;
   }
 
   // Executes a move and returns undo state that can be passed to undoMove() to
@@ -83,10 +99,13 @@ function State(
   // Important: `move` must be the last move done, and `undoState` must be the
   // unmodified object return by the corresponding call to `doMove()`.
   function undoMove(move, undoState) {
-    if (nextPlayer === 0) nextPlayer = cfg.playerCount;
-    --nextPlayer;
-    lastMove = undoState[0];
-    if (move.length !== 0) {
+    // This implementation is essentially the same as doMoveInternal(), but in
+    // reverse. Keep the implementations in sync.
+    if (move.length === 0) {
+      incNextPlayer();
+    } else {
+      lastMove = undoState[0];
+      decNextPlayer();
       var src = move[0];
       var cnt = move[1];
       var dst = move[2];
