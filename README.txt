@@ -39,3 +39,14 @@ output files in the StackAndConquer data directory. On Linux, this is:
 ~/.local/share/stackandconquer/cpu/
 
 For more information, see: https://github.com/ElTh0r0/stackandconquer/wiki
+
+
+DEVELOPMENT
+-----------
+
+ESLint is used to detect bugs. Run the linter with:
+
+% npm run lint
+
+
+EOF
