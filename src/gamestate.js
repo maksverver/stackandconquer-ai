@@ -288,7 +288,7 @@ function playRandomMove(state, allMoves) {
   for (const moves of triageMoves(state, allMoves)) {
     if (moves.length > 0) {
       const choice = randomChoice(moves);
-      state.doMove(choice);
+      state._doMoveInternal(choice);
       return;
     }
   }
