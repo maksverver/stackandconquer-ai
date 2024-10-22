@@ -68,14 +68,14 @@ export function createConfig(
   return Object.freeze({
     apiToFieldIndex: Object.freeze(apiToFieldIndex),
     fieldIndexToApi: Object.freeze(fieldIndexToApi),
-    fieldCount: fieldCount,
+    fieldCount,
     moves: Object.freeze(moves),
-    winningHeight: winningHeight,
-    playerCount: playerCount,
+    winningHeight,
+    playerCount,
     // These are only used for move parsing/formatting and debug printing:
-    rows: rows,
-    cols: cols,
-    paddingSize: paddingSize,
+    rows,
+    cols,
+    paddingSize,
   });
 }
 

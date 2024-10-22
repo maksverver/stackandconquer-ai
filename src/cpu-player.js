@@ -59,8 +59,8 @@ export function callCpuWrapper(findBestMoves, cfg, jsonBoard) {
   if (fields.length !== cfg.fieldCount) throw new Error('Invalid number of fields');
 
   const state = createStateFromJson(cfg, {
-    fields: fields,
-    nextPlayer: nextPlayer,
+    fields,
+    nextPlayer,
     piecesLeft: game.getNumberOfStones(),
     scoresLeft: game.getTowersNeededToWin(),
     lastMove: convertMoveFromApi(game.getLastMove()),
