@@ -2,7 +2,7 @@ import {formatRow, formatCol, formatMove, formatMoves} from "./formatting.js";
 import {log, arrayOfValues, arrayOfObjects, randomChoice, rowColToFieldIndex} from "./util.js";
 
 // Move that represents passing (an empty array).
-var PASS = Object.freeze([]);
+const PASS = Object.freeze([]);
 
 function cloneArray(arr) {
   return arr.slice();
@@ -53,34 +53,34 @@ class State {
   _doMoveInternal(move) {
     // This implementation is essentially reversed in undoMove(). Keep the
     // implementations in sync.
-    var removed = null;
+    let removed = null;
     if (move.length === 0) {
       // Pass. Play returns to the *previous* player (which is the same as the
       // next player in a 2-player game).
       this._decNextPlayer();
       // Open question: should we update lastMove in this case?
     } else {
-      var src = move[0];
-      var cnt = move[1];
-      var dst = move[2];
-      var dstField = this.fields[dst];
+      const src = move[0];
+      const cnt = move[1];
+      const dst = move[2];
+      const dstField = this.fields[dst];
       if (src === -1) {
         const player = this.nextPlayer;
         --this.piecesLeft[player];
         dstField.push(player);
         this.occupied ^= 1 << dst;
       } else {
-        var srcField = this.fields[src];
+        const srcField = this.fields[src];
         dstField.push(...srcField.splice(srcField.length - cnt));
         if (srcField.length === 0) {
           this.occupied ^= 1 << src;
         }
         if (dstField.length >= this.cfg.winningHeight) {
           removed = dstField.splice(0);
-          var winner = removed[removed.length - 1];
+          const winner = removed[removed.length - 1];
           this.scoresLeft[winner] -= 1;
           this.occupied ^= 1 << dst;
-          for (var i = 0; i < removed.length; ++i) ++this.piecesLeft[removed[i]];
+          for (let i = 0; i < removed.length; ++i) ++this.piecesLeft[removed[i]];
         }
       }
       this._incNextPlayer();
@@ -109,20 +109,20 @@ class State {
     } else {
       this.lastMove = undoState[0];
       this._decNextPlayer();
-      var src = move[0];
-      var cnt = move[1];
-      var dst = move[2];
-      var dstField = this.fields[dst];
+      const src = move[0];
+      const cnt = move[1];
+      const dst = move[2];
+      const dstField = this.fields[dst];
       if (src === -1) {
         ++this.piecesLeft[this.nextPlayer];
         dstField.pop();
         this.occupied ^= 1 << dst;
       } else {
-        var srcField = this.fields[src];
-        var removed = undoState[1];
+        const srcField = this.fields[src];
+        const removed = undoState[1];
         if (removed != null) {
-          for (var i = 0; i < removed.length; ++i) --this.piecesLeft[removed[i]];
-          var winner = removed[removed.length - 1];
+          for (let i = 0; i < removed.length; ++i) --this.piecesLeft[removed[i]];
+          const winner = removed[removed.length - 1];
           this.scoresLeft[winner] += 1;
           dstField.push(...removed);
           this.occupied ^= 1 << dst;
@@ -148,16 +148,16 @@ class State {
     }
     const {cfg, nextPlayer, fields, occupied, scoresLeft} = this;
     const {moves: moveTemplates, winningHeight} = this.cfg;
-    var score = 10000 * (scoresLeft[1 - nextPlayer] - scoresLeft[nextPlayer]);
-    for (var dst = 0; dst < fields.length; ++dst) {
-      var dstField = fields[dst];
-      var dstHeight = dstField.length;
+    let score = 10000 * (scoresLeft[1 - nextPlayer] - scoresLeft[nextPlayer]);
+    for (let dst = 0; dst < fields.length; ++dst) {
+      const dstField = fields[dst];
+      const dstHeight = dstField.length;
       if (dstHeight > 0) {
-        var options = moveTemplates[dst][dstHeight];
+        const options = moveTemplates[dst][dstHeight];
         for (var i = 0; i < options.length; ++i) {
-          var src = options[i][0];
-          var srcField = fields[src]
-          var srcHeight = srcField.length;
+          const src = options[i][0];
+          const srcField = fields[src];
+          const srcHeight = srcField.length;
           if (srcHeight + dstHeight >= winningHeight && (occupied & options[i][1]) === 0) {
             if (srcField[srcHeight - 1] === nextPlayer) {
               // Winning move found!
@@ -200,26 +200,26 @@ class State {
     if (this.getWinner() !== -1) return [];  // Game is over
     const {cfg, fields, occupied, nextPlayer, lastMove, piecesLeft} = this;
     const {moves: moveTemplates} = cfg;
-    var moves = [];
-    var lastSrc = -1, lastCnt = 0, lastDst = -1;
+    const moves = [];
+    let lastSrc = -1, lastCnt = 0, lastDst = -1;
     if (lastMove != null && lastMove.length != 0) {
       lastSrc = lastMove[0];
       lastCnt = lastMove[1];
       lastDst = lastMove[2];
     }
-    for (var dst = 0; dst < fields.length; ++dst) {
-      var dstHeight = fields[dst].length;
+    for (let dst = 0; dst < fields.length; ++dst) {
+      const dstHeight = fields[dst].length;
       if (dstHeight === 0) {
         if (piecesLeft[nextPlayer]) {
           moves.push([-1, 1, dst]);  // place new piece
         }
       } else {
-        var options = moveTemplates[dst][dstHeight];
-        for (var i = 0; i < options.length; ++i) {
-          var src = options[i][0];
-          var srcHeight = fields[src].length;
+        const options = moveTemplates[dst][dstHeight];
+        for (let i = 0; i < options.length; ++i) {
+          const src = options[i][0];
+          const srcHeight = fields[src].length;
           if (srcHeight !== 0 && (occupied & options[i][1]) === 0) {
-            for (var cnt = 1; cnt <= srcHeight; ++cnt) {
+            for (let cnt = 1; cnt <= srcHeight; ++cnt) {
               // Do not allow undoing the last move.
               if (src == lastDst && cnt === lastCnt && dst == lastSrc) continue;
               moves.push([src, cnt, dst]);  // move pieces
@@ -237,13 +237,13 @@ class State {
   triageMoves(moves) {
     const fields = this.fields;
     const winningHeight = this.cfg.winningHeight;
-    var winningMoves = [];
-    var neutralMoves = [];
-    var losingMoves = [];
-    for (var i = 0; i < moves.length; ++i) {
-      var move = moves[i];
+    const winningMoves = [];
+    const neutralMoves = [];
+    const losingMoves = [];
+    for (let i = 0; i < moves.length; ++i) {
+      const move = moves[i];
       if (move.length !== 0 && fields[move[2]].length + move[1] >= winningHeight) {
-        var srcField = fields[move[0]];
+        const srcField = fields[move[0]];
         if (srcField[srcField.length - 1] === this.nextPlayer) {
           winningMoves.push(move);
         } else {
@@ -262,11 +262,11 @@ class State {
   //
   // This is only used by the Monte Carlo player.
   _playRandomMove() {
-    var triagedMoves = this.triageMoves(this.generateMoves());
-    for (var i = 0; i < triagedMoves.length; ++i) {
-      var moves = triagedMoves[i];
+    const triagedMoves = this.triageMoves(this.generateMoves());
+    for (let i = 0; i < triagedMoves.length; ++i) {
+      const moves = triagedMoves[i];
       if (moves.length > 0) {
-        var choice = randomChoice(moves);
+        const choice = randomChoice(moves);
         this.doMove(choice);
         return;
       }
@@ -280,7 +280,7 @@ class State {
   //
   // This is only used by the Monte Carlo player.
   randomPlayout(maxSteps) {
-    for (var step = 0; step < maxSteps; ++step) {
+    for (let step = 0; step < maxSteps; ++step) {
       if (this.getWinner() !== -1) return step;  // game over
       this._playRandomMove();
     }
@@ -294,17 +294,17 @@ class State {
     log('Scores left: ' + scoresLeft);
     log('Pieces left: ' + piecesLeft);
     log('Player ' + (nextPlayer + 1) + ' to move.');
-    for (var r = 0; r < rows; ++r) {
+    for (let r = 0; r < rows; ++r) {
       var line = formatRow(r) + '  ';
       for (var c = 0; c < cols; ++c) {
-        var src = rowColToFieldIndex(cfg, r, c);
+        const src = rowColToFieldIndex(cfg, r, c);
         var part = '';
         if (src === -1) {
           part = '#';  // not part of the board
         } else if (fields[src].length === 0) {
           part = '.';  // empty field
         } else {
-          for (var i = 0; i < fields[src].length; ++i) {
+          for (let i = 0; i < fields[src].length; ++i) {
             part += String(fields[src][i] + 1);
           }
         }
@@ -324,7 +324,7 @@ class State {
     }
     log(line);
     log('last move: ' + (lastMove ? formatMove(cfg, lastMove) : 'none'));
-    var moves = this.generateMoves();
+    const moves = this.generateMoves();
     log(moves.length + ' possible moves: ' + formatMoves(cfg, moves));
   }
 
@@ -363,9 +363,9 @@ class State {
 // the object afterwards.
 export function createStateFromJson(cfg, inputJson) {
   // Recompute `occupied` from given fields.
-  var fields = inputJson.fields;
-  var occupied = 0;
-  for (var i = 0; i < fields.length; ++i) {
+  const fields = inputJson.fields;
+  let occupied = 0;
+  for (let i = 0; i < fields.length; ++i) {
     if (fields[i].length > 0) occupied |= 1 << i;
   }
   return new State(cfg, fields, inputJson.nextPlayer, inputJson.lastMove, inputJson.piecesLeft, inputJson.scoresLeft, occupied);
@@ -387,9 +387,9 @@ export function createInitialState(cfg, piecesLeft, scoresLeft) {
   if (typeof piecesLeft === 'number') piecesLeft = arrayOfValues(cfg.playerCount, piecesLeft);
   if (scoresLeft == null) scoresLeft = 1;
   if (typeof scoresLeft === 'number') scoresLeft = arrayOfValues(cfg.playerCount, scoresLeft);
-  var fields = arrayOfObjects(cfg.fieldCount, Array);
-  var nextPlayer = 0;
-  var lastMove = null;
-  var occupied = 0;
+  const fields = arrayOfObjects(cfg.fieldCount, Array);
+  const nextPlayer = 0;
+  const lastMove = null;
+  const occupied = 0;
   return new State(cfg, fields, nextPlayer, lastMove, piecesLeft, scoresLeft, occupied);
 }

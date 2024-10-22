@@ -24,23 +24,23 @@
 import {log} from "./util.js";
 
 // Number of Monte Carlo simulation steps; higher is better, but slower.
-var TOTAL_BUDGET           = 50000;
-var MIN_BUDGET_PER_MOVE    =   500;
-var MAX_STEPS_TO_SIMULATE  =   250;  // used to break out of ties/loops
+const TOTAL_BUDGET           = 50000;
+const MIN_BUDGET_PER_MOVE    =   500;
+const MAX_STEPS_TO_SIMULATE  =   250;  // used to break out of ties/loops
 
 function evaluateWithRandomPlayouts(player, initialState, budget) {
-  var value = 0.0;
-  var errorPrinted = false;
-  var simulations = 0;
+  let value = 0.0;
+  let errorPrinted = false;
+  let simulations = 0;
   while (budget > 0) {
     // Hack: limit number of towers to win to 1, to increase speed and accuracy.
-    var state = initialState.clone(1);
-    var steps = state.randomPlayout(MAX_STEPS_TO_SIMULATE);
+    const state = initialState.clone(1);
+    const steps = state.randomPlayout(MAX_STEPS_TO_SIMULATE);
     if (steps >= MAX_STEPS_TO_SIMULATE && !errorPrinted) {
       log('WARNING: maxSteps exceeded!');
       errorPrinted = true;  // only print once
     }
-    var winner = state.getWinner();
+    const winner = state.getWinner();
     value += winner === player ? 1.0 : winner === -1 ? 0.5 : 0.0;
     simulations += 1;
     budget -= steps + 1;
@@ -54,25 +54,25 @@ export function evaluateState(state) {
 
 // Finds the best move among the given `moves` by simulating random playouts.
 export function findBestMoves(cfg, state, moves) {
-  var triagedMoves = state.triageMoves(moves);
+  const triagedMoves = state.triageMoves(moves);
   if (triagedMoves[0].length > 0) {
     // Winning moves available!
     return [triagedMoves[0], 1.0];
   }
-  var neutralMoves = triagedMoves[1];
+  const neutralMoves = triagedMoves[1];
   if (neutralMoves.length === 0) {
     // Only losing moves available.
     return [triagedMoves[2], 0.0];
   }
 
-  var player = state.getNextPlayer();
-  var simulationsPerMove = Math.max(MIN_BUDGET_PER_MOVE, Math.floor(TOTAL_BUDGET / neutralMoves.length));
-  var bestMoves = [];
-  var bestValue = 0.0;
-  for (var i = 0; i < neutralMoves.length; ++i) {
-    var move = neutralMoves[i];
-    var undoState = state.doMove(move);
-    var value = evaluateWithRandomPlayouts(player, state, simulationsPerMove);
+  const player = state.getNextPlayer();
+  const simulationsPerMove = Math.max(MIN_BUDGET_PER_MOVE, Math.floor(TOTAL_BUDGET / neutralMoves.length));
+  const bestMoves = [];
+  let bestValue = 0.0;
+  for (let i = 0; i < neutralMoves.length; ++i) {
+    const move = neutralMoves[i];
+    const undoState = state.doMove(move);
+    const value = evaluateWithRandomPlayouts(player, state, simulationsPerMove);
     state.undoMove(move, undoState);
     if (value > bestValue) {
       bestValue = value;

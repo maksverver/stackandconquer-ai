@@ -1,7 +1,7 @@
 import {findBestMoves} from "./montecarlo.js";
 import {callCpuWrapper, initCpuWrapper} from "./cpu-player.js";
 
-var cfg = null;
+let cfg = null;
 
 export function initCPU(jsonBoard) {
   cfg = initCpuWrapper(jsonBoard);

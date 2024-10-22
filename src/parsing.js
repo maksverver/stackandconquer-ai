@@ -21,18 +21,18 @@ import {rowColToFieldIndex} from "./util.js";
 export function parseMove(cfg, move) {
   if (move === 'pass') return [];
   if (move.length < 2 || move.length > 5) return undefined;
-  var i = 0;
-  var cnt = move.length % 2 === 1 ? move.charCodeAt(i++) - '0'.charCodeAt(0) : 1;
+  let i = 0;
+  const cnt = move.length % 2 === 1 ? move.charCodeAt(i++) - '0'.charCodeAt(0) : 1;
   if (!(cnt > 0 && cnt < cfg.winningHeight)) return undefined;
-  var src = -1;
-  var c1 = move.charCodeAt(i++) - 'a'.charCodeAt(0);
-  var r1 = move.charCodeAt(i++) - '1'.charCodeAt(0);
-  var dst = rowColToFieldIndex(cfg, r1, c1);
+  let src = -1;
+  const c1 = move.charCodeAt(i++) - 'a'.charCodeAt(0);
+  const r1 = move.charCodeAt(i++) - '1'.charCodeAt(0);
+  let dst = rowColToFieldIndex(cfg, r1, c1);
   if (!(dst >= 0)) return undefined;
   if (i < move.length) {
     src = dst;
-    var c2 = move.charCodeAt(i++) - 'a'.charCodeAt(0);
-    var r2 = move.charCodeAt(i++) - '1'.charCodeAt(0);
+    const c2 = move.charCodeAt(i++) - 'a'.charCodeAt(0);
+    const r2 = move.charCodeAt(i++) - '1'.charCodeAt(0);
     dst = rowColToFieldIndex(cfg, r2, c2);
     if (!(dst >= 0)) return undefined;
   }

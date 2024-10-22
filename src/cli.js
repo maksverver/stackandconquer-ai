@@ -8,7 +8,7 @@ import {createConfig, indexOfMove, log} from "./util.js";
 import {formatMoves} from "./formatting.js";
 import {parseMove} from "./parsing.js";
 
-var helpText = 'StackAndConquer CLI. Supported commands:\n' +
+const helpText = 'StackAndConquer CLI. Supported commands:\n' +
     '\n' +
     '  save  dumps the current state as a JSON string\n' +
     '  load  loads a state from a JSON string\n' +
@@ -21,7 +21,7 @@ var helpText = 'StackAndConquer CLI. Supported commands:\n' +
     '          a1 (place a new piece on field a1)\n' +
     '          3a1b2 (move 3 pieces from a1 to b2)\n';
 
-var paddedBoard =
+const paddedBoard =
     '-------' +
     '-ooooo-' +
     '-ooooo-' +
@@ -31,15 +31,15 @@ var paddedBoard =
     '-------';
 
 export function run(evaluateState, findBestMoves) {
-  var cfg = createConfig(5, 5, paddedBoard, '#', '-', 1, 5, 2);
+  const cfg = createConfig(5, 5, paddedBoard, '#', '-', 1, 5, 2);
 
-  var undoStack = [];
-  var redoStack = [];
+  const undoStack = [];
+  const redoStack = [];
 
-  var state = createInitialState(cfg);
+  let state = createInitialState(cfg);
   state.debugPrint();
 
-  var currentLineHandler = defaultLineHandler;
+  let currentLineHandler = defaultLineHandler;
 
   function defaultLineHandler(line) {
     if (line === 'help') {
@@ -53,7 +53,7 @@ export function run(evaluateState, findBestMoves) {
       if (undoStack.length === 0) {
         log('Undo stack is empty!');
       } else {
-        var item = undoStack.pop();
+        const item = undoStack.pop();
         redoStack.push(item[0]);
         state.undoMove(item[0], item[1]);
         state.debugPrint();
@@ -70,7 +70,7 @@ export function run(evaluateState, findBestMoves) {
     } else if (line == 'eval') {
       log(evaluateState(state));
     } else if (line === 'best') {
-      var result = findBestMoves(cfg, state, state.generateMoves());
+      const result = findBestMoves(cfg, state, state.generateMoves());
       log(result[0].length + ' best move(s) with value ' + result[1] + ': ' + formatMoves(cfg, result[0]));
     } else {
       var move = parseMove(cfg, line);
@@ -90,7 +90,7 @@ export function run(evaluateState, findBestMoves) {
   function loadLineHandler(line) {
     currentLineHandler = defaultLineHandler;
     try {
-      var newState = State(cfg, JSON.parse(line));
+      const newState = State(cfg, JSON.parse(line));
       newState.debugPrint();
       // Order matters here. Only overwrite state if debugPrint() succeeds,
       // so that if the state is invalid, we keep the old state.
@@ -104,7 +104,7 @@ export function run(evaluateState, findBestMoves) {
   }
 
   // Use Node.js readline library to process input.
-  var rl = readline.createInterface({
+  const rl = readline.createInterface({
       input: process.stdin,
       output: process.stdout});
   rl.on('line', (line) => currentLineHandler(line));
