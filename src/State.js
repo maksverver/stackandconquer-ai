@@ -80,7 +80,7 @@ class State {
           const winner = removed[removed.length - 1];
           this.scoresLeft[winner] -= 1;
           this.occupied ^= 1 << dst;
-          for (let i = 0; i < removed.length; ++i) ++this.piecesLeft[removed[i]];
+          for (const player of removed) ++this.piecesLeft[player];
         }
       }
       this._incNextPlayer();
@@ -121,7 +121,7 @@ class State {
         const srcField = this.fields[src];
         const removed = undoState[1];
         if (removed != null) {
-          for (let i = 0; i < removed.length; ++i) --this.piecesLeft[removed[i]];
+          for (const player of removed) --this.piecesLeft[player];
           const winner = removed[removed.length - 1];
           this.scoresLeft[winner] += 1;
           dstField.push(...removed);
@@ -154,11 +154,10 @@ class State {
       const dstHeight = dstField.length;
       if (dstHeight > 0) {
         const options = moveTemplates[dst][dstHeight];
-        for (let i = 0; i < options.length; ++i) {
-          const src = options[i][0];
+        for (const [src, mask] of options) {
           const srcField = fields[src];
           const srcHeight = srcField.length;
-          if (srcHeight + dstHeight >= winningHeight && (occupied & options[i][1]) === 0) {
+          if (srcHeight + dstHeight >= winningHeight && (occupied & mask) === 0) {
             if (srcField[srcHeight - 1] === nextPlayer) {
               // Winning move found!
               score += 1000;
