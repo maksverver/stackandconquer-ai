@@ -99,12 +99,15 @@ export function rowColToFieldIndex(cfg, row, col) {
   return res == null ? -1 : res;
 }
 
+// Returns a new array of the given length where each element is `value`.
 export function arrayOfValues(len, value) {
   const res = [];
   for (let i = 0; i < len; ++i) res.push(value);
   return res;
 }
 
+// Returns a new array of the given length where element are initialized by
+// calling `constructor()`.
 export function arrayOfObjects(len, constructor) {
   const fields = [];
   for (let i = 0; i < len; ++i) fields.push(constructor());

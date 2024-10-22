@@ -4,12 +4,8 @@ import {log, arrayOfValues, arrayOfObjects, randomChoice, rowColToFieldIndex} fr
 // Move that represents passing (an empty array).
 const PASS = Object.freeze([]);
 
-function cloneArray(arr) {
-  return arr.slice();
-}
-
-function cloneFields(arr) {
-  return arr.map(cloneArray);
+function cloneFields(fields) {
+  return fields.map(pieces => pieces.slice());
 }
 
 class State {
@@ -339,13 +335,15 @@ class State {
   }
 
   clone(winningScore) {
+    const scoresLeft = this.scoresLeft.slice();
+    if (winningScore != null) scoresLeft.fill(winningScore);
     return new State(
       this.cfg,
       cloneFields(this.fields),
       this.nextPlayer,
       this.lastMove,
-      cloneArray(this.piecesLeft),
-      winningScore == null ? cloneArray(this.scoresLeft) : arrayOfValues(this.cfg.playerCount, winningScore),
+      this.piecesLeft.slice(),
+      scoresLeft,
       this.occupied,
     );
   }
