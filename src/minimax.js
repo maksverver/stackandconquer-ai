@@ -14,7 +14,7 @@
 //  - add a transposition table?
 //
 
-import {evaluateImmediately} from "./State.js";
+import {evaluateImmediately} from "./gamestate.js";
 
 // Determines the strength of the AI: higher is better, but slower.
 const SEARCH_DEPTH = 4;

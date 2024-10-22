@@ -22,7 +22,7 @@
 //
 
 import {log} from "./util.js";
-import {randomPlayout, triageMoves} from "./State.js";
+import {randomPlayout, triageMoves} from "./gamestate.js";
 
 // Number of Monte Carlo simulation steps; higher is better, but slower.
 const TOTAL_BUDGET           = 50000;

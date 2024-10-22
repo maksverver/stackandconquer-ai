@@ -4,7 +4,7 @@
 
 import process from 'node:process';
 import readline from "node:readline";
-import {createInitialState, createStateFromJson, debugPrint} from "./State.js";
+import {createInitialState, createStateFromJson, debugPrint} from "./gamestate.js";
 import {createConfig, indexOfMove, log} from "./util.js";
 import {formatMoves} from "./formatting.js";
 import {parseMove} from "./parsing.js";

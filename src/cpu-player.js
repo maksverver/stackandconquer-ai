@@ -1,8 +1,8 @@
 // Wrapper that implements the StackAndConquer CallCPU API.
 
 import {formatMove, formatMoves} from "./formatting.js";
+import {createStateFromJson} from "./gamestate.js";
 import {createConfig, indexOfMove, log, randomChoice} from "./util.js";
-import {createStateFromJson} from "./State.js";
 
 function convertMoveFromApi(cfg, apiMove) {
   const {apiToFieldIndex} = cfg;
