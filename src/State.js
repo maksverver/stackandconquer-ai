@@ -147,14 +147,14 @@ class State {
       return winner === this.nextPlayer ? 1000000000 : -1000000000;
     }
     const {cfg, nextPlayer, fields, occupied, scoresLeft} = this;
-    const {moves: moveTemplates, winningHeight} = this.cfg;
+    const {moves: moveTemplates, winningHeight} = cfg;
     let score = 10000 * (scoresLeft[1 - nextPlayer] - scoresLeft[nextPlayer]);
     for (let dst = 0; dst < fields.length; ++dst) {
       const dstField = fields[dst];
       const dstHeight = dstField.length;
       if (dstHeight > 0) {
         const options = moveTemplates[dst][dstHeight];
-        for (var i = 0; i < options.length; ++i) {
+        for (let i = 0; i < options.length; ++i) {
           const src = options[i][0];
           const srcField = fields[src];
           const srcHeight = srcField.length;
@@ -176,7 +176,7 @@ class State {
           score -= 10 * dstHeight;
         }
         // Reward pieces on the board.
-        for (var i = 0; i < dstHeight; ++i) {
+        for (let i = 0; i < dstHeight; ++i) {
           if (dstField[i] === nextPlayer) {
             score += 1 + i;
           } else {
@@ -295,10 +295,10 @@ class State {
     log('Pieces left: ' + piecesLeft);
     log('Player ' + (nextPlayer + 1) + ' to move.');
     for (let r = 0; r < rows; ++r) {
-      var line = formatRow(r) + '  ';
-      for (var c = 0; c < cols; ++c) {
+      let line = formatRow(r) + '  ';
+      for (let c = 0; c < cols; ++c) {
         const src = rowColToFieldIndex(cfg, r, c);
-        var part = '';
+        let part = '';
         if (src === -1) {
           part = '#';  // not part of the board
         } else if (fields[src].length === 0) {
@@ -316,9 +316,9 @@ class State {
       }
       log(line);
     }
-    var line = '   ';
-    for (var c = 0; c < cols; ++c) {
-      var part = formatCol(c);
+    let line = '   ';
+    for (let c = 0; c < cols; ++c) {
+      let part = formatCol(c);
       while (part.length < winningHeight) part += ' ';
       line += ' ' + part;
     }

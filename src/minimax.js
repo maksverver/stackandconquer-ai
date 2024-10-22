@@ -31,7 +31,7 @@ export function findBestMoves(unusedCfg, state, moves) {
     const moves = state.generateMoves();
     if (moves.length === 0) {
       // Game is over. Adjust value by `depthLeft` to reward quicker wins.
-      var value = state.evaluate();
+      let value = state.evaluate();
       if (value > 0) value += depthLeft;
       if (value < 0) value -= depthLeft;
       return value;
@@ -40,7 +40,7 @@ export function findBestMoves(unusedCfg, state, moves) {
     for (let i = 0; i < moves.length; ++i) {
       const move = moves[i];
       const undoState = state.doMove(move);
-      var value = -search(depthLeft - 1, -beta, -alpha);
+      const value = -search(depthLeft - 1, -beta, -alpha);
       state.undoMove(move, undoState);
       if (value > bestValue) {
         bestValue = value;

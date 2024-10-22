@@ -19,9 +19,9 @@ export function createConfig(
   const apiToFieldIndex = [];
   const fieldIndexToApi = [];
   let fieldCount = 0;
-  for (var r1 = 0; r1 < paddedRows; ++r1) {
-    for (var c1 = 0; c1 < paddedCols; ++c1) {
-      var i = paddedCols * r1 + c1;
+  for (let r1 = 0; r1 < paddedRows; ++r1) {
+    for (let c1 = 0; c1 < paddedCols; ++c1) {
+      const i = paddedCols * r1 + c1;
       if (inputFields[i] === outside || inputFields[i] === padding) {
         apiToFieldIndex.push(-1);
       } else {
@@ -45,17 +45,17 @@ export function createConfig(
       if (inputFields[j] === outside || inputFields[j] === padding) continue;
       const dst = moves.length;
       moves.push([]);
-      for (var height = 0; height < winningHeight; ++height) {
+      for (let height = 0; height < winningHeight; ++height) {
         moves[dst].push([]);
       }
       for (let dir = 0; dir < 8; ++dir) {
         const dr = DR[dir], dc = DC[dir];
         let mask = 0;
-        for (var height = 1; height < winningHeight; ++height) {
-          var r1 = r2 - dr*height;
-          var c1 = c2 - dc*height;
+        for (let height = 1; height < winningHeight; ++height) {
+          const r1 = r2 - dr*height;
+          const c1 = c2 - dc*height;
           if (r1 < 0 || r1 >= paddedRows || c1 < 0 || c1 >= paddedCols) break;
-          var i = paddedCols * r1 + c1;
+          const i = paddedCols * r1 + c1;
           if (inputFields[i] === outside || inputFields[i] === padding) break;
           const src = apiToFieldIndex[i];
           moves[dst][height].push([src, mask]);

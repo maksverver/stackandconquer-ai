@@ -62,8 +62,8 @@ export function run(evaluateState, findBestMoves) {
       if (redoStack.length === 0) {
         log('Redo stack is empty!');
       } else {
-        var move = redoStack.pop();
-        var undoState = state.doMove(move);
+        const move = redoStack.pop();
+        const undoState = state.doMove(move);
         undoStack.push([move, undoState]);
         state.debugPrint();
       }
@@ -73,13 +73,13 @@ export function run(evaluateState, findBestMoves) {
       const result = findBestMoves(cfg, state, state.generateMoves());
       log(result[0].length + ' best move(s) with value ' + result[1] + ': ' + formatMoves(cfg, result[0]));
     } else {
-      var move = parseMove(cfg, line);
+      const move = parseMove(cfg, line);
       if (move == null) {
         log('Could not parse move!');
       } else if (indexOfMove(state.generateMoves(), move) < 0) {
         log('Invalid move!')
       } else {
-        var undoState = state.doMove(move);
+        const undoState = state.doMove(move);
         undoStack.push([move, undoState]);
         redoStack.length = 0;
         state.debugPrint();
