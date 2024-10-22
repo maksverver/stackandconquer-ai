@@ -1,6 +1,7 @@
 // A grab bag of utility functions used by other parts of the code.
 
 // Note: unlike console.log(), game.log() supports only a single string argument!
+// eslint-disable-next-line no-undef
 export const log = typeof game === 'object' ? game.log : console.log;
 
 // Creates a static descriptor of a board configuration.

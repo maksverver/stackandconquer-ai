@@ -344,8 +344,7 @@ class State {
       this.lastMove,
       this.piecesLeft.slice(),
       scoresLeft,
-      this.occupied,
-    );
+      this.occupied);
   }
 }
 

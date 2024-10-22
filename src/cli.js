@@ -2,8 +2,9 @@
 //
 // Execute 'help' for a list of commands
 
+import process from 'node:process';
 import readline from "node:readline";
-import {createInitialState} from "./State.js";
+import {createInitialState, createStateFromJson} from "./State.js";
 import {createConfig, indexOfMove, log} from "./util.js";
 import {formatMoves} from "./formatting.js";
 import {parseMove} from "./parsing.js";
@@ -90,7 +91,7 @@ export function run(evaluateState, findBestMoves) {
   function loadLineHandler(line) {
     currentLineHandler = defaultLineHandler;
     try {
-      const newState = State(cfg, JSON.parse(line));
+      const newState = createStateFromJson(cfg, JSON.parse(line));
       newState.debugPrint();
       // Order matters here. Only overwrite state if debugPrint() succeeds,
       // so that if the state is invalid, we keep the old state.

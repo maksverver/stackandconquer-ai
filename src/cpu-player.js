@@ -5,13 +5,14 @@ import {createConfig, indexOfMove, log, randomChoice} from "./util.js";
 import {createStateFromJson} from "./State.js";
 
 function convertMoveFromApi(cfg, apiMove) {
+  const {apiToFieldIndex} = cfg;
   if (apiMove == null) return null;
   if (apiMove.length === 0) return apiMove;
   let src = apiMove[0];
   const cnt = apiMove[1];
   let dst = apiMove[2];
-  if (src !== -1) src = cfg.apiToFieldIndex[src];
-  dst = cfg.apiToFieldIndex[dst];
+  if (src !== -1) src = apiToFieldIndex[src];
+  dst = apiToFieldIndex[dst];
   return [src, cnt, dst];
 }
 
@@ -24,8 +25,7 @@ export function initCpuWrapper(jsonBoard) {
     game.getPadding(),
     game.getHeightToWin(),  // padding size
     game.getHeightToWin(),
-    game.getNumOfPlayers(),
-  );
+    game.getNumOfPlayers());
 }
 
 // Reconstructs config and state from jsonBoard and jsonMoves, invokes
