@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "lint": "eslint",
-    "build": "echo 'Error: run `make` instead' && exit 1",
+    "build": "make all",
     "test": "echo 'Error: no test specified' && exit 1"
   },
   "repository": {
