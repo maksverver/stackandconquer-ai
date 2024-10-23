@@ -6,8 +6,7 @@ import {createConfig, indexOfMove, log, randomChoice} from "./util.js";
 
 function convertMoveFromApi(cfg, apiMove) {
   const {apiToFieldIndex} = cfg;
-  if (apiMove == null) return null;
-  if (apiMove.length === 0) return apiMove;
+  if (apiMove == null || apiMove.length === 0) return null;
   let src = apiMove[0];
   const cnt = apiMove[1];
   let dst = apiMove[2];
@@ -43,7 +42,7 @@ export function callCpuWrapper(findBestMoves, cfg, jsonBoard) {
   const apiMoves = JSON.parse(game.getLegalMoves());
   if (apiMoves.length === 0) throw new Error('No moves available');
   if (apiMoves.length === 1) return apiMoves[0];
-  const moves = apiMoves.map(convertMoveFromApi.bind(null, cfg));
+  const moves = apiMoves.map(move => convertMoveFromApi(cfg, move));
 
   const fields = [];
   for (let i = 0; i < cfg.fieldCount; ++i) {
@@ -63,7 +62,7 @@ export function callCpuWrapper(findBestMoves, cfg, jsonBoard) {
     nextPlayer,
     piecesLeft: game.getNumberOfStones(),
     scoresLeft: game.getTowersNeededToWin(),
-    lastMove: convertMoveFromApi(game.getLastMove()),
+    lastMove: convertMoveFromApi(cfg, game.getLastMove()),
   });
 
   const result = findBestMoves(cfg, state, moves);
