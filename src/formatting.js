@@ -15,7 +15,7 @@ export function formatCol(col) {
 
 export function formatField(cfg, field) {
   const [row, col] = fieldIndexToRowCol(cfg, field);
-  return formatCol(row) + formatRow(col);
+  return formatCol(col) + formatRow(row);
 }
 
 export function formatMove(cfg, move) {
