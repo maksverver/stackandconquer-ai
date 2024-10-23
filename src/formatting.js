@@ -29,10 +29,5 @@ export function formatMove(cfg, move) {
 }
 
 export function formatMoves(cfg, moves) {
-  let res = '';
-  for (let i = 0; i < moves.length; ++i) {
-    if (i > 0) res += ' ';
-    res += formatMove(cfg, moves[i]);
-  }
-  return res;
+  return moves.map(move => formatMove(cfg, move)).join(' ');
 }
