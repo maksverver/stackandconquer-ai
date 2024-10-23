@@ -43,3 +43,9 @@ export const triangleConfig = createConfig(
    '#0000000#' +
    '000000000').split(''),
   '#', '-', 0, 5, 2);
+
+export const wideConfig = createConfig(
+  2, 15, '..............................', '#', '-', 0, 5, 2);
+
+export const tallConfig = createConfig(
+  15, 2, '..............................', '#', '-', 0, 5, 2);

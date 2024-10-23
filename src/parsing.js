@@ -5,6 +5,13 @@
 
 import {rowColToFieldIndex} from "./util.js";
 
+function parseField(cfg, s) {
+  const c = s.charCodeAt(s[0]) - 'a'.charCodeAt(0);
+  const r = parseInt(s.slice(1), 10) - 1;
+  const i = rowColToFieldIndex(cfg, r, c);
+  return i >= 0 ? i : undefined;
+}
+
 // Parses a move string into an array [src, cnt, dst], indicating that `cnt`
 // stones are moved from `src` to `dst`. (If a new stone is placed on an empty
 // field, src === -1 and cnt === 1.)
@@ -20,21 +27,11 @@ import {rowColToFieldIndex} from "./util.js";
 // validate the move beyond checking the coordinates are valid.
 export function parseMove(cfg, move) {
   if (move === 'pass') return [];
-  if (move.length < 2 || move.length > 5) return undefined;
-  let i = 0;
-  const cnt = move.length % 2 === 1 ? move.charCodeAt(i++) - '0'.charCodeAt(0) : 1;
-  if (!(cnt > 0 && cnt < cfg.winningHeight)) return undefined;
-  let src = -1;
-  const c1 = move.charCodeAt(i++) - 'a'.charCodeAt(0);
-  const r1 = move.charCodeAt(i++) - '1'.charCodeAt(0);
-  let dst = rowColToFieldIndex(cfg, r1, c1);
-  if (!(dst >= 0)) return undefined;
-  if (i < move.length) {
-    src = dst;
-    const c2 = move.charCodeAt(i++) - 'a'.charCodeAt(0);
-    const r2 = move.charCodeAt(i++) - '1'.charCodeAt(0);
-    dst = rowColToFieldIndex(cfg, r2, c2);
-    if (!(dst >= 0)) return undefined;
-  }
+  const m = move.match(/([1-9][0-9]*)?([a-z][1-9][0-9]*)?([a-z][1-9][0-9]*)/);
+  if (!m) return undefined;
+  const cnt = m[1] != null ? parseInt(m[1], 10) : 1;
+  const src = m[2] != null ? parseField(cfg, m[2]) : -1;
+  const dst = parseField(cfg, m[3]);
+  if (src == null || dst == null) return undefined;
   return [src, cnt, dst];
 }
