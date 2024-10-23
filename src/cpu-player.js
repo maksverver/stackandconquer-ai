@@ -15,6 +15,10 @@ function convertMoveFromApi(cfg, apiMove) {
   return [src, cnt, dst];
 }
 
+function movesToCanonicalString(cfg, moves) {
+  return moves.map(move => formatMove(cfg, move)).sort().join(',');
+}
+
 export function initCpuWrapper(jsonBoard) {
   return createConfig(
     game.getBoardDimensionY(),
@@ -64,6 +68,20 @@ export function callCpuWrapper(findBestMoves, cfg, jsonBoard) {
     scoresLeft: game.getTowersNeededToWin(),
     lastMove: convertMoveFromApi(cfg, game.getLastMove()),
   });
+
+  // For debugging: verify the game's move list matches what I would generate.
+  const movesString = movesToCanonicalString(cfg, moves);
+  const generatedMovesString = movesToCanonicalString(cfg, state.generateMoves());
+  if (movesString !== generatedMovesString) {
+    // This currently only happens for the 3-player games. I should sync my
+    // implementation once the 3-player rules are fully fleshed out:
+    // https://github.com/ElTh0r0/stackandconquer/issues/14
+    log('WARNING: API-provided moves differ from generated moves');
+    // log('\tConfig:          ' + JSON.stringify(cfg));  // too spammy
+    log('State:           ' + JSON.stringify(state.toJson()));
+    log('Provided moves:  ' + movesString);
+    log('Generated moves: ' + generatedMovesString);
+  }
 
   const result = findBestMoves(cfg, state, moves);
   const bestMoves = result[0];
