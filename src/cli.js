@@ -54,9 +54,9 @@ export function run(evaluateState, findBestMoves) {
       if (undoStack.length === 0) {
         log('Undo stack is empty!');
       } else {
-        const item = undoStack.pop();
-        redoStack.push(item[0]);
-        state.undoMove(item[0], item[1]);
+        const [move, undoState] = undoStack.pop();
+        redoStack.push(move);
+        state.undoMove(move, undoState);
         debugPrint(state);
       }
     } else if (line === 'redo') {

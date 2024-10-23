@@ -7,9 +7,7 @@ import {createConfig, indexOfMove, log, randomChoice} from "./util.js";
 function convertMoveFromApi(cfg, apiMove) {
   const {apiToFieldIndex} = cfg;
   if (apiMove == null || apiMove.length === 0) return null;
-  let src = apiMove[0];
-  const cnt = apiMove[1];
-  let dst = apiMove[2];
+  let [src, cnt, dst] = apiMove;
   if (src !== -1) src = apiToFieldIndex[src];
   dst = apiToFieldIndex[dst];
   return [src, cnt, dst];
@@ -83,9 +81,7 @@ export function callCpuWrapper(findBestMoves, cfg, jsonBoard) {
     log('Generated moves: ' + generatedMovesString);
   }
 
-  const result = findBestMoves(cfg, state, moves);
-  const bestMoves = result[0];
-  const bestValue = result[1];
+  const [bestMoves, bestValue] = findBestMoves(cfg, state, moves);
   const bestMove = randomChoice(bestMoves);
   log(moves.length + ' moves, ' + bestMoves.length + ' best with value ' + bestValue + ': ' +
       formatMoves(cfg, bestMoves) + '; selected ' + formatMove(cfg, bestMove) + ' at random');

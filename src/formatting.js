@@ -14,15 +14,13 @@ export function formatCol(col) {
 }
 
 export function formatField(cfg, field) {
-  const coords = fieldIndexToRowCol(cfg, field);
-  return formatCol(coords[1]) + formatRow(coords[0]);
+  const [row, col] = fieldIndexToRowCol(cfg, field);
+  return formatCol(row) + formatRow(col);
 }
 
 export function formatMove(cfg, move) {
   if (move.length === 0) return 'pass';
-  const src = move[0];
-  const cnt = move[1];
-  const dst = move[2];
+  const [src, cnt, dst] = move;
   let res = '';
   if (cnt !== 1) res += String(cnt);
   if (src !== -1) res += formatField(cfg, src);

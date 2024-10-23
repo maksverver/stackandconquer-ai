@@ -56,9 +56,7 @@ class State {
       this._decNextPlayer();
       // Open question: should we update lastMove in this case?
     } else {
-      const src = move[0];
-      const cnt = move[1];
-      const dst = move[2];
+      const [src, cnt, dst] = move;
       const dstField = this.fields[dst];
       if (src === -1) {
         const player = this.nextPlayer;
@@ -105,9 +103,7 @@ class State {
     } else {
       this.lastMove = undoState[0];
       this._decNextPlayer();
-      const src = move[0];
-      const cnt = move[1];
-      const dst = move[2];
+      const [src, cnt, dst] = move;
       const dstField = this.fields[dst];
       if (src === -1) {
         ++this.piecesLeft[this.nextPlayer];
@@ -146,9 +142,7 @@ class State {
     const moves = [];
     let lastSrc = -1, lastCnt = 0, lastDst = -1;
     if (lastMove != null && lastMove.length != 0) {
-      lastSrc = lastMove[0];
-      lastCnt = lastMove[1];
-      lastDst = lastMove[2];
+      [lastSrc, lastCnt, lastDst] = lastMove;
     }
     for (let dst = 0; dst < fields.length; ++dst) {
       const dstHeight = fields[dst].length;
