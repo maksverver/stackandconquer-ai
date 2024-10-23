@@ -10,7 +10,13 @@ output/%-bundle.js: src/%.js src/*.js
 output/%.js: data/%-header.txt output/%-bundle.js
 	cat $^ >$@
 
+lint:
+	npm run lint
+
+test:
+	npm run test
+
 clean:
 	rm -f -- $(OUTPUTS)
 
-.PHONY: all clean
+.PHONY: all lint test clean
