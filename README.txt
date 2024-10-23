@@ -49,4 +49,13 @@ ESLint is used to detect bugs. Run the linter with:
 % npm run lint
 
 
+Run tests with;
+
+% npm test
+
+which invokes:
+
+% node --test
+
+
 EOF
