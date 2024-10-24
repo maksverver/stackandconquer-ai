@@ -62,4 +62,11 @@ Or to run all tests, including slow tests:
 % npm run all-tests
 
 
+To show test coverage:
+
+% npm run coverage
+
+(Note the report excludes files which have no coverage at all!)
+
+
 EOF
