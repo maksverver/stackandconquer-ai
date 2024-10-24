@@ -44,18 +44,22 @@ For more information, see: https://github.com/ElTh0r0/stackandconquer/wiki
 DEVELOPMENT
 -----------
 
-ESLint is used to detect bugs. Run the linter with:
+ESLint is used to detect bugs. To run:
 
 % npm run lint
 
 
-Run tests with;
+To run tests:
 
 % npm test
 
-which invokes:
+Or:
 
 % node --test
+
+Or to run all tests, including slow tests:
+
+% npm run all-tests
 
 
 EOF
