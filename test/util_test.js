@@ -216,3 +216,26 @@ test('indexOfMove', () => {
   assert.equal(util.indexOfMove([[1,2,3], [4, 5, 6]], [7, 8, 9]), -1);
   assert.equal(util.indexOfMove([[1,2,3], [4, 5, 6]], []), -1);
 });
+
+test('randomChoice', async t => {
+  await t.test('basic functionality', () => {
+    assert.equal(util.randomChoice([]), undefined);
+    assert.equal(util.randomChoice([42]), 42);
+    assert.equal(util.randomChoice([1, 1, 1]), 1);
+  });
+
+  await t.test('random test', () => {
+    // Pick a random value from a set of three, 3000 times. We expect each
+    // value to be picked around a 1000 times. We check that the true count lies
+    // between 800 and 1200 which should be loose enough that the test can't
+    // fail randomly.
+    let counts = {a: 0, b: 0, c: 0};
+    const keys = Object.keys(counts);
+    for (let i = 0; i < 3000; ++i) {
+      counts[util.randomChoice(keys)]++;
+    }
+    const values = Object.values(counts);
+    assert.ok(Math.min(...values) > 800, values);
+    assert.ok(Math.max(...values) < 1200, values);
+  });
+});
