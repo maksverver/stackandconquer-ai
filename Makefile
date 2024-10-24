@@ -5,10 +5,10 @@ OUTPUTS=output/MinimaxCPU.js output/MonteCarloCPU.js
 all: $(OUTPUTS)
 
 output:
-	mkdir "$@"
+	mkdir $@
 
 output/%-bundle.js: src/%.js src/*.js | output
-	$(ROLLUP) --validate -i "$<" | grep -v '^export ' > "$@"
+	$(ROLLUP) --validate -i $< | grep -v '^export ' >$@
 
 output/%.js: data/%-header.txt output/%-bundle.js
 	cat $^ >$@
