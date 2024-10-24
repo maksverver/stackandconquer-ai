@@ -1,4 +1,4 @@
-import test from 'node:test';
+import test, {suite} from 'node:test';
 import {strict as assert} from 'node:assert';
 import * as formatting from '../src/formatting.js';
 import * as testdata from './testdata.js';
@@ -16,8 +16,8 @@ test('formatCol', () => {
   assert.equal(formatting.formatCol(25), 'z');
 });
 
-test('formatField', async (t) => {
-  await t.test('standard board', () => {
+suite('formatField', () => {
+  test('standard board', () => {
     const cfg = testdata.standardConfig;
     assert.equal(formatting.formatField(cfg,  0), 'a1');
     assert.equal(formatting.formatField(cfg,  1), 'b1');
@@ -27,7 +27,7 @@ test('formatField', async (t) => {
     assert.equal(formatting.formatField(cfg, 24), 'e5');
   });
 
-  await t.test('triangular board', () => {
+  test('triangular board', () => {
     const cfg = testdata.triangleConfig;
     assert.equal(formatting.formatField(cfg,  0), 'e1');
     assert.equal(formatting.formatField(cfg,  1), 'd2');
@@ -39,8 +39,8 @@ test('formatField', async (t) => {
 });
 
 // Keep in sync with parsing_test.js.
-test('formatMove', async (t) => {
-  await t.test('standard board', () => {
+suite('formatMove', () => {
+  test('standard board', () => {
     const cfg = testdata.standardConfig;
     assert.equal(formatting.formatMove(cfg, []), 'pass');
     assert.equal(formatting.formatMove(cfg, [-1, 1,  7]), 'c2');
@@ -48,7 +48,7 @@ test('formatMove', async (t) => {
     assert.equal(formatting.formatMove(cfg, [ 0, 2, 24]), '2a1e5');
   });
 
-  await t.test('triangular board', () => {
+  test('triangular board', () => {
     const cfg = testdata.triangleConfig;
     assert.equal(formatting.formatMove(cfg, []), 'pass');
     assert.equal(formatting.formatMove(cfg, [-1, 1, 7]), 'f3');

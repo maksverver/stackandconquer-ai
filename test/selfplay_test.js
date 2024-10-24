@@ -1,5 +1,5 @@
 import {strict as assert} from 'node:assert';
-import test from 'node:test';
+import test, {suite} from 'node:test';
 import {findBestMoves as findMinimaxMoves} from '../src/minimax.js';
 import {findBestMoves as findMonteCarloMoves} from '../src/montecarlo.js';
 import {indexOfMove, randomChoice, log} from '../src/util.js';
@@ -37,12 +37,12 @@ function playGame(cfg, state, players, maxMoves=1000) {
   }
 }
 
-test('selfplay', {skip}, async t => {
+suite('selfplay', {skip}, () => {
 
-  await t.test('regular board', async t => {
+  suite('regular board', () => {
     const cfg = testdata.standardConfig;
 
-    await t.test('dummy vs Monte Carlo', () => {
+    test('dummy vs Monte Carlo', () => {
       const state = createInitialState(cfg, 20, 1);
       const players = [findDummyMoves, findMonteCarloMoves];
 
@@ -52,7 +52,7 @@ test('selfplay', {skip}, async t => {
     });
 
 
-    await t.test('Monte Carlo vs Minimax', () => {
+    test('Monte Carlo vs Minimax', () => {
       const state = createInitialState(cfg, 20, 3);  // note three rounds
       const players = [findMonteCarloMoves, findMinimaxMoves];
 
@@ -62,7 +62,7 @@ test('selfplay', {skip}, async t => {
     });
   });
 
-  await t.test('triangular board', () => {
+  test('triangular board', () => {
     const cfg = testdata.triangleConfig;
     const state = createInitialState(cfg, 20, 1);  // note only 1 round
 
@@ -71,10 +71,10 @@ test('selfplay', {skip}, async t => {
     assert.ok(state.getWinner() >= 0);
   });
 
-  await t.test('three player game', async t => {
+  suite('three player game', () => {
     const cfg = testdata.threePlayerConfig;
 
-    await t.test('Monte Carlo vs itself', () => {
+    test('Monte Carlo vs itself', () => {
       const state = createInitialState(cfg, 15, 1);
       const players = [findMonteCarloMoves, findMonteCarloMoves, findMonteCarloMoves];
 
@@ -84,7 +84,7 @@ test('selfplay', {skip}, async t => {
       assert(state.getWinner() >= 0 || !finished);
     });
 
-    await t.test('Monte Carlo vs dummies', () => {
+    test('Monte Carlo vs dummies', () => {
       const state = createInitialState(cfg, 15, 1);
 
       playGame(cfg, state, [findDummyMoves, findMonteCarloMoves, findDummyMoves]);

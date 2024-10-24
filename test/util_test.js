@@ -1,10 +1,10 @@
-import test from 'node:test';
+import test, {suite} from 'node:test';
 import {strict as assert} from 'node:assert';
 import * as testdata from './testdata.js';
 import * as util from "../src/util.js";
 
-test('createConfig', async (t) => {
-  await t.test('standard board', () => {
+suite('createConfig', () => {
+  test('standard board', () => {
     assert.deepEqual(testdata.standardConfig, {
       apiToFieldIndex: [
           -1, -1, -1, -1, -1, -1, -1,
@@ -55,7 +55,7 @@ test('createConfig', async (t) => {
     });
   });
 
-  await t.test('triangle board', () => {
+  test('triangle board', () => {
     assert.deepEqual(testdata.triangleConfig, {
       apiToFieldIndex: [
         -1, -1, -1, -1,  0, -1, -1, -1, -1,
@@ -106,8 +106,8 @@ test('createConfig', async (t) => {
   });
 });
 
-test('fieldIndexToRowCol', async (t) => {
-  await t.test('standard board', () => {
+suite('fieldIndexToRowCol', () => {
+  test('standard board', () => {
     const cfg = testdata.standardConfig;
     assert.deepEqual(util.fieldIndexToRowCol(cfg,  0), [0, 0]);
     assert.deepEqual(util.fieldIndexToRowCol(cfg,  1), [0, 1]);
@@ -122,7 +122,7 @@ test('fieldIndexToRowCol', async (t) => {
     assert.deepEqual(util.fieldIndexToRowCol(cfg, 25), [NaN, NaN]);
   });
 
-  await t.test('triangle board', () => {
+  test('triangle board', () => {
     const cfg = testdata.triangleConfig;
     assert.deepEqual(util.fieldIndexToRowCol(cfg,  0), [0, 4]);
     assert.deepEqual(util.fieldIndexToRowCol(cfg,  1), [1, 3]);
@@ -133,8 +133,8 @@ test('fieldIndexToRowCol', async (t) => {
   });
 });
 
-test('rowColToFieldIndex', async (t) => {
-  await t.test('standard board', () => {
+suite('rowColToFieldIndex', () => {
+  test('standard board', () => {
     const cfg = testdata.standardConfig;
     assert.deepEqual(util.rowColToFieldIndex(cfg, 0, 0),  0);
     assert.deepEqual(util.rowColToFieldIndex(cfg, 0, 1),  1);
@@ -152,7 +152,7 @@ test('rowColToFieldIndex', async (t) => {
     assert.deepEqual(util.rowColToFieldIndex(cfg, 99, 99), -1);
   });
 
-  await t.test('triangle board', () => {
+  test('triangle board', () => {
     const cfg = testdata.triangleConfig;
     assert.deepEqual(util.rowColToFieldIndex(cfg, 0, 4),  0);
     assert.deepEqual(util.rowColToFieldIndex(cfg, 1, 3),  1);
@@ -163,32 +163,32 @@ test('rowColToFieldIndex', async (t) => {
   });
 });
 
-test('arrayOfValues', async (t) => {
-  await t.test('empty array', () => {
+suite('arrayOfValues', () => {
+  test('empty array', () => {
     assert.deepEqual(util.arrayOfValues(0), []);
   });
 
-  await t.test('primitive copies', () => {
+  test('primitive copies', () => {
     assert.deepEqual(util.arrayOfValues(3, 42), [42, 42, 42]);
   });
 
-  await t.test('object copies', () => {
+  test('object copies', () => {
     const a = util.arrayOfValues(3, {});
     assert.equal(a[0], a[1]);
     assert.equal(a[1], a[2]);
   });
 });
 
-test('arrayOfObjects', async (t) => {
-  await t.test('empty array', () => {
+suite('arrayOfObjects', () => {
+  test('empty array', () => {
     assert.deepEqual(util.arrayOfObjects(0, Array), []);
   });
 
-  await t.test('primite copies', () => {
+  test('primite copies', () => {
     assert.deepEqual(util.arrayOfObjects(3, Number), [0, 0, 0]);
   });
 
-  await t.test('object copies', () => {
+  test('object copies', () => {
     const a = util.arrayOfObjects(3, Array);
     assert.deepEqual(a, [[], [], []]);
     assert.notEqual(a[0], a[1]);
@@ -217,14 +217,14 @@ test('indexOfMove', () => {
   assert.equal(util.indexOfMove([[1,2,3], [4, 5, 6]], []), -1);
 });
 
-test('randomChoice', async t => {
-  await t.test('basic functionality', () => {
+suite('randomChoice', () => {
+  test('basic functionality', () => {
     assert.equal(util.randomChoice([]), undefined);
     assert.equal(util.randomChoice([42]), 42);
     assert.equal(util.randomChoice([1, 1, 1]), 1);
   });
 
-  await t.test('random test', () => {
+  test('random test', () => {
     // Pick a random value from a set of three, 3000 times. We expect each
     // value to be picked around a 1000 times. We check that the true count lies
     // between 800 and 1200 which should be loose enough that the test can't

@@ -1,11 +1,11 @@
-import test from 'node:test';
+import test, {suite} from 'node:test';
 import {strict as assert} from 'node:assert';
 import {parseMove} from '../src/parsing.js';
 import * as testdata from './testdata.js';
 
 // Keep in sync with parsing_test.js.
-test('parseMove', async (t) => {
-  await t.test('standard board', () => {
+suite('parseMove', () => {
+  test('standard board', () => {
     const cfg = testdata.standardConfig;
     assert.deepEqual(parseMove(cfg, 'pass'), []);
     assert.deepEqual(parseMove(cfg, 'c2'), [-1, 1,  7]);
@@ -17,7 +17,7 @@ test('parseMove', async (t) => {
     assert.deepEqual(parseMove(cfg, 'a99'), undefined);
   });
 
-  await t.test('triangular board', () => {
+  test('triangular board', () => {
     const cfg = testdata.triangleConfig;
     assert.deepEqual(parseMove(cfg, 'pass'), []);
     assert.deepEqual(parseMove(cfg, 'f3'), [-1, 1, 7]);
@@ -30,11 +30,11 @@ test('parseMove', async (t) => {
     assert.equal(parseMove(cfg, 'i4'), undefined);
   });
 
-  await t.test('wide board', () => {
+  test('wide board', () => {
     assert.deepEqual(parseMove(testdata.wideConfig, 'o2'), [-1, 1, 29]);
   });
 
-  await t.test('tall board', () => {
+  test('tall board', () => {
     assert.deepEqual(parseMove(testdata.tallConfig, 'b15'), [-1, 1, 29]);
   });
 });
