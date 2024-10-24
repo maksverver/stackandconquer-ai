@@ -374,7 +374,9 @@ export function debugPrint(state) {
           part += String(fields[src][i] + 1);
         }
       }
-      while (part.length < winningHeight) part += ' ';
+      if (c + 1 < cols) {
+        while (part.length < winningHeight) part += ' ';
+      }
       line += ' ' + part;
       if (src !== -1 && ((occupied & (1 << src)) !== 0) != (fields[src].length !== 0)) {
         log('INTERNAL ERROR: occupied does not match fields at ' + src);
@@ -385,7 +387,9 @@ export function debugPrint(state) {
   let line = '   ';
   for (let c = 0; c < cols; ++c) {
     let part = formatCol(c);
-    while (part.length < winningHeight) part += ' ';
+    if (c + 1 < cols) {
+      while (part.length < winningHeight) part += ' ';
+    }
     line += ' ' + part;
   }
   log(line);
