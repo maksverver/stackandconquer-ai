@@ -349,7 +349,17 @@ export function debugPrint(state) {
   const {rows, cols, winningHeight} = cfg;
   log('Scores left: ' + scoresLeft);
   log('Pieces left: ' + piecesLeft);
-  log('Player ' + (nextPlayer + 1) + ' to move.');
+  const moves = state.generateMoves();
+  if (moves.length === 0) {
+    const winner = state.getWinner();
+    if (winner == -1) {
+      log('Game ended prematurely.');
+    } else {
+      log('Player ' + (winner + 1) + ' won.');
+    }
+  } else {
+    log('Player ' + (nextPlayer + 1) + ' to move.');
+  }
   for (let r = 0; r < rows; ++r) {
     let line = formatRow(r) + '  ';
     for (let c = 0; c < cols; ++c) {
@@ -380,6 +390,5 @@ export function debugPrint(state) {
   }
   log(line);
   log('last move: ' + (lastMove ? formatMove(cfg, lastMove) : 'none'));
-  const moves = state.generateMoves();
   log(moves.length + ' possible moves: ' + formatMoves(cfg, moves));
 }
