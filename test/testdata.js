@@ -6,28 +6,17 @@ import {createConfig} from "../src/util.js";
 // a4 b4 c4 d4 e4
 // a5 b5 c5 d5 e5
 
-export const standardConfig = createConfig(
-  5, 5,
-  ('-------' +
-   '-.....-' +
-   '-.....-' +
-   '-.....-' +
-   '-.....-' +
-   '-.....-' +
-   '-------').split(''),
-  '#', '-', 1, 5, 2);
+const square5x5x1 = (
+    '-------' +
+    '-.....-' +
+    '-.....-' +
+    '-.....-' +
+    '-.....-' +
+    '-.....-' +
+    '-------').split('');
 
-export const threePlayerConfig = createConfig(
-  5, 5,
-  ('-------' +
-   '-.....-' +
-   '-.....-' +
-   '-.....-' +
-   '-.....-' +
-   '-.....-' +
-   '-------').split(''),
-  '#', '-', 1, 5, 3);
-
+export const standardConfig = createConfig(5, 5, square5x5x1, '#', '-', 1, 5, 2);
+export const threePlayerConfig = createConfig(5, 5, square5x5x1, '#', '-', 1, 5, 3);
 
 //             e1
 //          d2 e2 f2
@@ -35,17 +24,15 @@ export const threePlayerConfig = createConfig(
 //    b4 c4 d4 e4 f4 g4 h4
 // a5 b5 c5 d5 e5 f5 g5 h5 i5
 
-export const triangleConfig = createConfig(
-  5, 9,
-  ('####0####' +
-   '###000###' +
-   '##00000##' +
-   '#0000000#' +
-   '000000000').split(''),
-  '#', '-', 0, 5, 2);
+const triangle5x9x0 =
+    '####0####' +
+    '###000###' +
+    '##00000##' +
+    '#0000000#' +
+    '000000000';
 
-export const wideConfig = createConfig(
-  2, 15, '..............................', '#', '-', 0, 5, 2);
+export const triangleConfig = createConfig(5, 9, triangle5x9x0, '#', '-', 0, 5, 2);
+export const threePlayerTriangleConfig = createConfig(5, 9, triangle5x9x0, '#', '-', 0, 5, 3);
 
-export const tallConfig = createConfig(
-  15, 2, '..............................', '#', '-', 0, 5, 2);
+export const wideConfig = createConfig(2, 15, '..............................', '#', '-', 0, 5, 2);
+export const tallConfig = createConfig(15, 2, '..............................', '#', '-', 0, 5, 2);

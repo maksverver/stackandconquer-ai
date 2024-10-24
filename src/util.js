@@ -1,8 +1,18 @@
 // A grab bag of utility functions used by other parts of the code.
 
-// Note: unlike console.log(), game.log() supports only a single string argument!
 // eslint-disable-next-line no-undef
-export const log = typeof game === 'object' ? game.log : console.log;
+let logDelegate = typeof game === 'object' ? game.log : console.log;
+
+export function getLogDelegateForTest() { return logDelegate; }
+export function setLogDelegateForTest(fn) { logDelegate = fn; }
+
+// Note: unlike console.log(), game.log() supports only a single string argument!
+export function log(...args) {
+  if (args.length !== 1) {
+    throw new Error('log() expects exactly 1 argument!');
+  }
+  logDelegate(args[0]);
+}
 
 // Creates a static descriptor of a board configuration.
 //
