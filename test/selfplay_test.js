@@ -20,13 +20,13 @@ function playGame(cfg, state, players, maxMoves=1000) {
 
     const nextPlayer = state.getNextPlayer();
     const findBestMoves = players[nextPlayer];
-    const [bestMoves, unusedValue] = findBestMoves(cfg, state, moves);
+    const [bestMoves] = findBestMoves(cfg, state, moves);
     assert.ok(bestMoves.length > 0);
     const move = randomChoice(bestMoves);
     assert.ok(indexOfMove(moves, move) >= 0, move);
     state.doMove(move);
 
-    if (false) {
+    if (false) {  // eslint-disable-line no-constant-condition
       log(`Player ${nextPlayer + 1} selected move ${formatMove(cfg, move)}`);
       debugPrint(state);
     }
