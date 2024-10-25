@@ -2,19 +2,9 @@ import test, {afterEach, beforeEach, suite} from 'node:test';
 import * as util from '../src/util.js';
 import {strict as assert} from 'node:assert';
 import * as gamestate from '../src/gamestate.js';
-import {parseMove} from '../src/parsing.js';
-import {formatMove} from '../src/formatting.js'
+import {formatMove, formatMoves} from '../src/formatting.js'
 import * as testdata from './testdata.js';
-
-function replay(cfg, state, movesString) {
-  for (const moveString of movesString.split(' ')) {
-    const move = parseMove(cfg, moveString);
-    if (move == null) throw new Error(`Could not parse move: "${moveString}"`);
-    const moves = state.generateMoves();
-    if (util.indexOfMove(moves, move) < 0) throw new Error(`Invalid move: "${moveString}"`);
-    state.doMove(move);
-  }
-}
+import {parseMoves, replay} from './testutil.js';
 
 suite('debugPrint', () => {
   let oldLog = null;
@@ -186,7 +176,7 @@ suite('getWinner', () => {
 });
 
 
-suite('clone', () => {
+test('clone', () => {
   const cfg = testdata.standardConfig;
   const baseState = gamestate.createInitialState(cfg, 20, 3);
   replay(cfg, baseState, 'a1 b1 a3 b1a1 a3a1 d3 c3 d3c3 e4 d5 e5 d5e4 2e4e5');
@@ -211,9 +201,32 @@ suite('clone', () => {
   assert.deepEqual(state2.scoresLeft, [1, 0]);
 });
 
-// The following functions from gamestate.js are not tested here, but are tested
-// indirectly via selfplay_test.js:
-//
-//  - evaluateImmediately()
-//  - triageMoves()
-//  - randomPlayout()
+
+test('triageMoves', () => {
+  const cfg = testdata.standardConfig;
+  const state = gamestate.createInitialState(cfg);
+  replay(cfg, state, 'a1 b1 a3 b1a1 a3a1 d3 c3 d3c3 e4 d5 e5 d5e4 2e4e5');
+
+  const inputMoves = parseMoves(cfg, '2e5c3 3a1c3 c1 3e5c3');
+  const triagedMoves = gamestate.triageMoves(state, inputMoves);
+
+  assert.deepEqual(
+    triagedMoves.map(moves => formatMoves(cfg, moves)),
+    ['3e5c3', '2e5c3 c1', '3a1c3']);
+});
+
+test('randomPlayout', () => {
+  const cfg = testdata.standardConfig;
+  const state = gamestate.createInitialState(cfg);
+
+  // Hit maxsteps
+  let steps = gamestate.randomPlayout(state, 3);
+  assert.equal(steps, 3);
+  assert.equal(state.getNextPlayer(), 1);
+  assert.equal(state.getWinner(), -1);
+
+  // Continue until finished (statistically virtually guaranteed)
+  steps = gamestate.randomPlayout(state, 1000);
+  assert.ok(6 <= steps && steps < 1000, steps);
+  assert.ok(state.getWinner() !== -1);
+});
