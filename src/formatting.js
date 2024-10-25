@@ -1,8 +1,10 @@
-// Helper functions for formatting moves as text strings of the form:
-// "1a2b3", meaning "move 1 stone from a2 to b3".
+// formatting.js -- helper functions for formatting moves as text strings.
+//
+// Strings are of the form: "2a3b4", meaning "move 2 stones from a3 to b4", or
+// "e5" meaning "place a new stone on e5".
 //
 // See parsing.js for the opposite.
-
+//
 import {fieldIndexToRowCol} from "./util.js";
 
 export function formatRow(row) {

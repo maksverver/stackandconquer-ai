@@ -1,8 +1,10 @@
-// Helper functions for parsing moves as text strings of the form:
-// "1a2b3", meaning "move 1 stone from a2 to b3".
+// parsing.js -- helper functions for parsing moves as text strings.
+//
+// Strings are of the form: "2a3b4", meaning "move 2 stones from a3 to b4", or
+// "e5" meaning "place a new stone on e5".
 //
 // See formatting.js for the opposite.
-
+//
 import {rowColToFieldIndex} from "./util.js";
 
 function parseField(cfg, s) {

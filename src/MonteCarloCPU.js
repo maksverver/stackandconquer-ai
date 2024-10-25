@@ -1,3 +1,5 @@
+// MonteCarloCPU.js -- a CPU player based on Monte Carlo methods.
+//
 import {findBestMoves} from "./montecarlo.js";
 import {CpuPlayer} from "./cpu-player.js";
 

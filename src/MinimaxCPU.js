@@ -1,3 +1,5 @@
+// MinimaxCPU.js -- a CPU player based on Minimax game tree search.
+//
 import {findBestMoves} from "./minimax.js";
 import {CpuPlayer} from "./cpu-player.js";
 

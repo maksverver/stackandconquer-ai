@@ -1,4 +1,4 @@
-// Minimax algorithm for game tree search.
+// minimax.js -- Minimax algorithm for game tree search.
 //
 // This implementation uses the Negamax variant with alpha-beta pruning.
 //
@@ -13,7 +13,6 @@
 //    avoid wasting work when a beta-cutoff happens.
 //  - add a transposition table?
 //
-
 import {evaluateImmediately} from "./gamestate.js";
 
 // Determines the strength of the AI: higher is better, but slower.

@@ -1,5 +1,5 @@
-// A grab bag of utility functions used by other parts of the code.
-
+// util.js -- a grab bag of utility functions used by other parts of the code.
+//
 // eslint-disable-next-line no-undef
 let logDelegate = typeof game === 'object' ? game.log : console.log;
 

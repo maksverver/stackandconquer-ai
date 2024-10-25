@@ -1,4 +1,4 @@
-// Player implementation based on Monte Carlo simulations.
+// montecarlo.js -- Player implementation based on Monte Carlo simulations.
 //
 // This is stronger than the "Advanced" CPU in the StackAndConquer distribution
 // but weaker than minimax.js. Compared to minimax.js it has the following
@@ -20,7 +20,6 @@
 //    a winning move is found, keep executing winning moves only until
 //    none are left, and then count how many points each player scored?)
 //
-
 import {log} from "./util.js";
 import {randomPlayout, triageMoves} from "./gamestate.js";
 

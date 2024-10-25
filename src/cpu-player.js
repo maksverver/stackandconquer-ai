@@ -1,5 +1,5 @@
-// Wrapper that implements the StackAndConquer CallCPU API.
-
+// cpu-player.js -- Wrapper that implements the StackAndConquer CallCPU API.
+//
 import {formatMove, formatMoves} from "./formatting.js";
 import {createStateFromJson} from "./gamestate.js";
 import {createConfig, indexOfMove, log, randomChoice} from "./util.js";

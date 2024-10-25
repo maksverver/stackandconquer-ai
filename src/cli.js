@@ -1,7 +1,7 @@
-// Text-based interface (requires node.js)
+// cli.js -- Text-based interface (requires node.js)
 //
 // Execute 'help' for a list of commands
-
+//
 import process from 'node:process';
 import readline from "node:readline";
 import {createInitialState, createStateFromJson, debugPrint} from "./gamestate.js";

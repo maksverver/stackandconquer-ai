@@ -1,3 +1,5 @@
+// gamestate.js -- mutable state representation of a game in progress
+//
 import {formatRow, formatCol, formatMove, formatMoves} from "./formatting.js";
 import {log, arrayOfValues, arrayOfObjects, randomChoice, rowColToFieldIndex} from "./util.js";
 
