@@ -69,4 +69,31 @@ To show test coverage:
 (Note the report excludes files which have no coverage at all!)
 
 
+RELEASE TESTING
+---------------
+
+The only part of the code which, by design, has no tests is cpu-player.js, which
+implements the API between StackAndConquer and the players. Testing it would
+require a fake `game` object implementation, but it is exactly this API that is
+likely to change, so me implementing what I think the API *should* be would not
+be helpful in guaranteeing the CPU players work correctly with the
+StackAndConquer API.
+
+Instead, the CPU players should be tested directly in StackAndConquer. Some
+configurations to try:
+
+  - 2-player game between MinimaxCPU and AdvancedCPU (e.g. 3 points):
+    MinimaxCPU should always win.
+
+  - 2-player game between MonteCarloCPU and MinimaxCPU (e.g. 3 points):
+    MinimaxCPU should usually win
+
+  - 3-player game with MonteCarloCPU and two copies of AdvancedCPU:
+    MonteCarloCPU should score about twice as many points as each other player.
+
+  - Finally, test MinimaxCPU and MonteCarloCPU against older versions of
+    themselves in a multiround match (e.g. 5 towers total) to ensure they are
+    of similar (or better) playing strength and runtime performace.
+
+
 EOF
