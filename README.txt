@@ -72,6 +72,13 @@ To show test coverage:
 RELEASE TESTING
 ---------------
 
+Before releasing, run:
+
+% npm run lint
+% npm run all-tests
+% npm run coverage       # optional, or:
+% npm run full-coverage  # even more optional
+
 The only part of the code which, by design, has no tests is cpu-player.js, which
 implements the API between StackAndConquer and the players. Testing it would
 require a fake `game` object implementation, but it is exactly this API that is

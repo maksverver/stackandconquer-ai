@@ -8,7 +8,8 @@
     "build": "make all",
     "test": "node --test",
     "all-tests": "env RUN_SLOW_TESTS=1 node --test",
-    "coverage": "node --test --experimental-test-coverage"
+    "coverage": "node --test --experimental-test-coverage",
+    "full-coverage": "env RUN_SLOW_TESTS=1 node --test --experimental-test-coverage"
   },
   "repository": {
     "type": "git",
