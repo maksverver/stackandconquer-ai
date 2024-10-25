@@ -4,6 +4,10 @@ import js from "@eslint/js";
 const rules = {
   ...js.configs.recommended.rules,
   ...importPlugin.flatConfigs.recommended.rules,
+  'no-unused-vars': ['error', {
+    argsIgnorePattern: '^_',
+    varsIgnorePattern: '^_',
+  }],
 };
 
 const plugins = {
